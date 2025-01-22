@@ -6,7 +6,7 @@ import { PORT } from "./config/config.js";
 import log from "./utils/logHandler.js";
 import connectDb from "./database/connect.js";
 import errorHandler from "./utils/errorHandler.js";
-import {customerRouter,addressRouter,refreshTokenRouter} from "./routes/router.js"
+import {customerRouter,addressRouter} from "./routes/router.js"
 
 connectDb();
 
@@ -22,7 +22,7 @@ app.use(errorHandler);
 
 app.use("/api/customers",customerRouter);
 app.use("/api/addresses",addressRouter);
-app.use("/api/tokens",refreshTokenRouter);
+
 
 app.listen(PORT,()=>{
     log.info(`Customer service is running on ${PORT}`);

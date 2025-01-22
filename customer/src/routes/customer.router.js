@@ -1,11 +1,17 @@
 import express from "express";
+import { customerLogin, customerLogout, customerRegister, deleteCustomer, resetPassword, resetToken } from "../controllers/customer.controller.js";
+import verifyRefreshTokenMiddleware from "../middleware/verifyRefreshToken.js";
 
 const customerRouter = express.Router();
 
-customerRouter.post("/register", createCustomer);   // Create account  
-customerRouter.put("/update", updateCustomer);      // Update customer info  
-customerRouter.delete("/delete", deleteCustomer);   // Delete customer account  
-customerRouter.post("/reset-password", resetPassword); // Reset password  
+
+//auth 
+customerRouter.post("/register", customerRegister); 
+customerRouter.post("/login", customerLogin);  
+customerRouter.post("/reset-token", verifyRefreshTokenMiddleware,resetToken); 
+customerRouter.patch("/reset-password", verifyRefreshTokenMiddleware,resetPassword); 
+customerRouter.post("/logout", verifyRefreshTokenMiddleware,customerLogout); 
+customerRouter.delete("/delete", verifyRefreshTokenMiddleware, deleteCustomer);
 
 
 export default customerRouter;

@@ -1,4 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const customerSchema = new mongoose.Schema(
     {
@@ -12,12 +14,16 @@ const customerSchema = new mongoose.Schema(
         required: true,
       },
       phone: {
-        type: Number,
+        type: String,
         unique: true,
       },
       address: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Address",
+        street: String,
+        postalCode: String,
+        city: String,
+        state: String,
+        country: String,
+        _id:String,
       },
       cart: [
         {
@@ -59,6 +65,36 @@ const customerSchema = new mongoose.Schema(
     }
   );
 
+
+customerSchema.pre("save",async function(next){
+  if(!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password,10);
+  next();
+})
+
+customerSchema.methods.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
+customerSchema.methods.generateAccessToken = async function () {
+  return jwt.sign(
+      {
+          userId: this._id,
+          email: this.email,
+      },
+      process.env.ACCESS_TOKEN_SECRET, 
+      {
+          expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+      }
+  );
+};
+
+customerSchema.methods.generateRefreshToken = async function () {
+  return jwt.sign(
+      { userId: this._id },
+      process.env.REFRESH_TOKEN_SECRET, 
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+  );
+};
 const Customer = mongoose.model("Customer", customerSchema);
 
 export default Customer;
