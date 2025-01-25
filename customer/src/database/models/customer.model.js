@@ -23,35 +23,32 @@ const customerSchema = new mongoose.Schema(
         city: String,
         state: String,
         country: String,
-        _id:String,
+        addressId:{ type:mongoose.Schema.Types.ObjectId, ref: "Address", required: true },
       },
-      cart: [
+        cart: [
         {
-          product: {
-            _id: { type: String, required: true },
-            name: { type: String, required: true },
-            photo: { type: String, default: "default.jpg" },
-            price: { type: Number, required: true },
-          },
-          unit: { type: Number, required: true, min: 1 },
-        },
+          productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+          quantity: { type: Number, required: true, min: 1 },
+        }
       ],
       wishlist: [
         {
-          _id: { type: String, required: true },
-          name: { type: String, required: true },
-          description: { type: String, required: true },
-          photo: { type: String, required: true },
-          available: { type: Boolean, required: true },
-          price: { type: Number, required: true },
-        },
+          productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+        }
       ],
       orders: [
         {
-          _id: { type: String, required: true },
-          amount: { type: Number, required: true },
-          timeWhenOrdered: { type: Date, default: Date.now },
-        },
+          orderId: { type: mongoose.Schema.Types.ObjectId, ref: "Order", required: true },
+          products: [
+            {
+              productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+              priceAtPurchase: Number,  
+              quantity: Number,
+            },
+          ],
+          orderDate: { type: Date, default: Date.now },
+          status: { type: String, enum: ["pending", "shipped", "delivered", "cancelled"], default: "pending" },
+        }
       ],
     },
     {
