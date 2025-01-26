@@ -1,5 +1,12 @@
 import express from "express";
+import { addItemToCart, clearCart, removeItemFromCart } from "../controllers/cart.controller.js";
+
 
 const cartRouter = express.Router();
+
+
+cartRouter.post("/add", addItemToCart);
+cartRouter.post("/remove", removeItemFromCart);
+cartRouter.put("/clear", clearCart);
 
 export default cartRouter

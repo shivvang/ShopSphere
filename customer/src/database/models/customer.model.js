@@ -23,7 +23,7 @@ const customerSchema = new mongoose.Schema(
         city: String,
         state: String,
         country: String,
-        addressId:{ type:mongoose.Schema.Types.ObjectId, ref: "Address", required: true },
+        addressId:{ type:mongoose.Schema.Types.ObjectId, ref: "Address" },
       },
         cart: [
         {
