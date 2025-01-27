@@ -4,6 +4,8 @@ const deilveryQueue = new Queue("",{
     connection:{
         host:"",
         port:0,
-        password:"",
+        password:"",    
     }
-})
+});
+
+export {deilveryQueue}
