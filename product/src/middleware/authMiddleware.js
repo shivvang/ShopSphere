@@ -16,7 +16,7 @@ const authenticatedRequest = (req,res,next)=>{
         });
     }
 
-    req.body.user = userId; 
+    req.user = userId; 
 
     log.info("User authenticated for Product routes");
 

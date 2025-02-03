@@ -1,14 +1,14 @@
-import logger from "../utils/logger.js";
+import log from "../utils/logHandler.js";
 
 const authenticatedRequest = (req,res,next)=>{
 
-   logger.info("validating user before hitting the problem routes");
+    log.info("validating user before hitting the problem routes");
 
     const  userId = req.headers["x-user-id"];
     
     if(!userId){
 
-        logger.warn("Access to problem  end point without user id");
+        log.warn("Access to problem  end point without user id");
         
         return res.status(401).json({
             succes:false,
@@ -16,9 +16,9 @@ const authenticatedRequest = (req,res,next)=>{
         });
     }
 
-    req.body.user = userId; 
+    req.user = userId; 
 
-    logger.info("User authenticated for Shopping routes");
+    log.info("User authenticated for Shopping routes");
 
     next();
 }

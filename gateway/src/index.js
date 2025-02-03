@@ -11,7 +11,7 @@ import { ApiError } from "../src/utils/ApiError.js";
 import {RedisStore} from "rate-limit-redis";
 import proxy from "express-http-proxy";
 import validatetoken from "./Middleware/authenticateUser.js";
-
+import log from "./utils/logHandler.js";
 
 const app = express();
 const PORT = process.env.PORT || 7000;
@@ -64,7 +64,7 @@ app.use("/v1/customers",proxy(process.env.CUSTOMER_SERVICE_URL,{
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
-        logger.info(`Response received from Customer service : ${proxyRes.statusCode}`)
+        log.info(`Response received from Customer service : ${proxyRes.statusCode}`)
         return proxyResData;
     }
 }))
@@ -76,7 +76,7 @@ app.use("/v1/addresses",proxy(process.env.CUSTOMER_SERVICE_URL,{
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
-        logger.info(`Response received from Customer service : ${proxyRes.statusCode}`)
+        log.info(`Response received from Customer service : ${proxyRes.statusCode}`)
         return proxyResData;
     }
 }))
@@ -91,7 +91,7 @@ app.use("/v1/products",validatetoken,proxy(process.env.PRODUCT_SERVICE_URL,{
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
-        logger.info(`Response received from Product service : ${proxyRes.statusCode}`)
+        log.info(`Response received from Product service : ${proxyRes.statusCode}`)
         return proxyResData;
     }
 }))
@@ -107,7 +107,7 @@ app.use("/v1/cart",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
-        logger.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
+        log.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
         return proxyResData;
     }
 }))
@@ -120,7 +120,7 @@ app.use("/v1/wishlist",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
-        logger.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
+        log.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
         return proxyResData;
     }
 }))
@@ -134,7 +134,7 @@ app.use("/v1/orders",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
-        logger.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
+        log.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
         return proxyResData;
     }
 }))
@@ -142,8 +142,8 @@ app.use("/v1/orders",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
 
 app.listen(PORT,()=>{
     log.info(`Api Gateway is Running on Port ${PORT}`);
-    logger.info(`Customer service running on  ${process.env.CUSTOMER_SERVICE_URL}`);
-    logger.info(`Product service running on  ${process.env.PRODUCT_SERVICE_URL}`);
-    logger.info(`Shopping service running on  ${process.env.SHOPPING_SERVICE_URL}`);
-    logger.info(`Redis is running on  ${process.env.REDIS_URL}`);
+    log.info(`Customer service running on  ${process.env.CUSTOMER_SERVICE_URL}`);
+    log.info(`Product service running on  ${process.env.PRODUCT_SERVICE_URL}`);
+    log.info(`Shopping service running on  ${process.env.SHOPPING_SERVICE_URL}`);
+    log.info(`Redis is running on  ${process.env.REDIS_URL}`);
 })
