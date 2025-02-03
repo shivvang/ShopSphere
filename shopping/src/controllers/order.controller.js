@@ -1,4 +1,5 @@
 import Order from "../database/models/Order.model.js";
+import { deilveryQueue } from "../Queue/bullmq.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
 
@@ -16,24 +17,48 @@ export const setOrder = async (req, res, next) => {
 
         let order = await Order.findOne({ userId });
 
+        let orderUpdated = false; // Flag to track if order changes
+
         if (!order) {
             log.info(`Creating new order for user: ${userId}`);
+
             order = new Order({
                 userId,
                 products: [{ productId, quantity, priceAtPurchase }],
             });
+
+            orderUpdated = true;
+
         } else {
             const existingProduct = order.products.find(item => item.productId.toString() === productId);
         
             if (!existingProduct) {
                 log.info(`Adding new product ${productId} to existing order for user: ${userId}`);
                 order.products.push({ productId, quantity, priceAtPurchase });
+
+               orderUpdated = true;
+
             } else {
                 log.info(`Product ${productId} already exists in the order. No action taken.`);
             }
         }
 
         await order.save();
+
+        //what to share via there is still unkown as im supposed to be let the user know this product or certain details of it is processed and he will recieve it after the delay
+        //how to let the frontend now about this is unkown via sockets maybe idk
+
+        if (orderUpdated) {
+            await deilveryQueue.add("processOrder", jobData, {
+                jobId: "", // Unique job ID
+                delay: 0,
+                removeOnComplete: true,
+                removeOnFail: false,
+            });
+
+            log.info(`Delivery job added for order: ${order._id.toString()}`);
+        }
+
         log.info(`Order created successfully for user: ${userId}`);
 
         return res.status(200).json({ message: "Order placed successfully", order });
