@@ -1,4 +1,5 @@
 import Wishlist from "../database/models/Wishlist.model.js";
+import { publishEventToExchange } from "../Queue/rabbitmq.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
 
@@ -33,6 +34,11 @@ export const addToWishlist = async (req, res, next) => {
             wishlist.items.push({ productId });
             log.info(`Product ${productId} added to wishlist for user: ${userId}`);
         }
+
+        await publishEventToExchange("wishlist.new", {
+            userId: userId.toString(),
+            productId: productId.toString(),
+        });
 
         await wishlist.save();
         return res.status(200).json({ message: "Product added to wishlist successfully" });
@@ -69,12 +75,17 @@ export const removeFromWishlist = async (req, res, next) => {
             log.warn(`Product ${productId} not found in wishlist for user: ${userId}`);
             return res.status(404).json({ message: "Product not found in wishlist" });
         }
-
         // Remove the item from the wishlist
         wishlist.items.splice(existingItemIndex, 1);
         await wishlist.save();
 
         log.info(`Product ${productId} removed from wishlist for user: ${userId}`);
+
+        await publishEventToExchange("wishlist.delete", {
+            userId: userId.toString(),
+            productId: productId.toString(),
+        });
+
         return res.status(200).json({ message: "Product removed from wishlist successfully" });
 
     } catch (error) {
@@ -88,7 +99,7 @@ export const clearWishlist = async (req, res, next) => {
     log.info("Clear wishlist endpoint hit");
 
     try {
-        const userId = req.userId || "67960cda3d6f39e1b96e6178";
+        const userId = req.userId;
 
         if (!userId) {
             log.warn("User ID is missing in request");
@@ -106,12 +117,18 @@ export const clearWishlist = async (req, res, next) => {
             log.info(`Wishlist is already empty for user: ${userId}`);
             return res.status(200).json({ message: "Wishlist is already empty" });
         }
-
         // Clear all items
         wishlist.items = [];
         await wishlist.save();
 
         log.info(`Wishlist cleared successfully for user: ${userId}`);
+
+        await publishEventToExchange("wishlist.clear", {
+            userId: userId.toString(),
+            cleared: true,
+        });
+
+        
         return res.status(200).json({ message: "Wishlist cleared successfully" });
 
     } catch (error) {
