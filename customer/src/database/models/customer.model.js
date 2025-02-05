@@ -39,17 +39,15 @@ const customerSchema = new mongoose.Schema(
       orders: [
         {
           orderId: { type: mongoose.Schema.Types.ObjectId, ref: "Order", required: true },
-          products: [
-            {
-              productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-              priceAtPurchase: Number,  
-              quantity: Number,
-            },
-          ],
+          product: {
+           productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+           priceAtPurchase: Number,  
+           quantity: Number,
+                   },
           orderDate: { type: Date, default: Date.now },
-          status: { type: String, enum: ["pending", "shipped", "delivered", "cancelled"], default: "pending" },
+          status: { type: String, enum: ["pending","delivered", "cancelled"], default: "pending" },
         }
-      ],
+      ]
     },
     {
       toJSON: {

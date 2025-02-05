@@ -1,67 +1,61 @@
 import Order from "../database/models/Order.model.js";
 import { deilveryQueue } from "../Queue/bullmq.js";
+import { publishEventToExchange } from "../Queue/rabbitmq.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
 
 export const setOrder = async (req, res, next) => {
-    log.info("set order entry point hit");
+    log.info("setOrder entry point hit");
 
     try {
         const { userId } = req;
-        const { productId, quantity, priceAtPurchase } = req.body; 
+        const { productId, quantity, priceAtPurchase } = req.body;
 
         if (!userId || !productId || !quantity || quantity <= 0 || !priceAtPurchase || priceAtPurchase <= 0) {
             log.warn("Invalid request: Missing or invalid fields.");
             return next(new ApiError("Invalid request. Ensure userId, productId, quantity, and priceAtPurchase are provided correctly.", 400));
         }
 
-        let order = await Order.findOne({ userId });
+        // Check if order for the same product and user already exists
+        const existingOrder = await Order.findOne({ userId, productId });
 
-        let orderUpdated = false; // Flag to track if order changes
-
-        if (!order) {
-            log.info(`Creating new order for user: ${userId}`);
-
-            order = new Order({
-                userId,
-                products: [{ productId, quantity, priceAtPurchase }],
-            });
-
-            orderUpdated = true;
-
-        } else {
-            const existingProduct = order.products.find(item => item.productId.toString() === productId);
-        
-            if (!existingProduct) {
-                log.info(`Adding new product ${productId} to existing order for user: ${userId}`);
-                order.products.push({ productId, quantity, priceAtPurchase });
-
-               orderUpdated = true;
-
-            } else {
-                log.info(`Product ${productId} already exists in the order. No action taken.`);
-            }
+        if (existingOrder) {
+            log.info(`Order already exists for product ${productId} by user ${userId}. No action taken.`);
+            return res.status(200).json({ message: "Order already exists", order: existingOrder });
         }
+
+        // Create a new order
+        const order = new Order({
+            userId,
+            productId,
+            quantity,
+            priceAtPurchase,
+            status: "pending"
+        });
 
         await order.save();
+        log.info(`New order created: ${order._id}`);
 
-        //what to share via there is still unkown as im supposed to be let the user know this product or certain details of it is processed and he will recieve it after the delay
-        //how to let the frontend now about this is unkown via sockets maybe idk
+        const jobData = { orderId: order._id,userId,productId,priceAtPurchase,quantity};
 
-        if (orderUpdated) {
-            await deilveryQueue.add("processOrder", jobData, {
-                jobId: "", // Unique job ID
-                delay: 0,
-                removeOnComplete: true,
-                removeOnFail: false,
-            });
+        // Add to delivery queue
+        await deilveryQueue.add("processOrder",jobData, {
+            jobId: order._id.toString(),
+            delay: 0,
+            removeOnComplete: true,
+            removeOnFail: false,
+        });
 
-            log.info(`Delivery job added for order: ${order._id.toString()}`);
-        }
+        // Publish event to notify system of the new order
+        await publishEventToExchange("order.place", {
+            orderId: order._id.toString(),
+            userId: userId.toString(),
+            productId: productId.toString(),
+        });
 
-        log.info(`Order created successfully for user: ${userId}`);
+        log.info(`Order processing event published for order: ${order._id}`);
 
-        return res.status(200).json({ message: "Order placed successfully", order });
+        return res.status(201).json({ message: "Order placed successfully", order });
 
     } catch (error) {
         log.error("Error placing order", error);
@@ -82,34 +76,34 @@ export const cancelOrder = async (req, res, next) => {
             return next(new ApiError("User ID and Product ID are required.", 400));
         }
 
-        const order = await Order.findOne({ userId });
-
+        const order = await Order.findOne({ userId, productId });
         if (!order) {
-            log.warn(`No active order found for user: ${userId}`);
+            log.warn(`No active order found for user: ${userId} and product: ${productId}`);
             return next(new ApiError("No active order found to cancel.", 404));
         }
 
-        const productIndex = order.products.findIndex(item => item.productId.toString() === productId);
+        // Update order status to cancelled
+        order.status = "cancelled";
+        await order.save();
+        log.info(`Order ${order._id} cancelled successfully.`);
 
-        if (productIndex === -1) {
-            log.warn(`Product ${productId} not found in order for user: ${userId}`);
-            return next(new ApiError("Product not found in the order.", 404));
-        }
 
-        // Remove product from order
-        order.products.splice(productIndex, 1);
+        const jobId = order._id.toString();
 
-        // If no more products left in order, delete the entire order
-        if (order.products.length === 0) {
-            await Order.deleteOne({ _id: order._id });
-            log.info(`Order ${order._id} deleted as no products remain.`);
-        } else {
-            await order.save();
-            log.info(`Product ${productId} removed from order ${order._id}.`);
-        }
+        // Remove the job from the queue
+        await deilveryQueue.getJob(jobId).then(job => {
+            if (job) {
+            return job.remove();
+            }
+        });
 
-        return res.status(200).json({ message: "Product successfully removed from order." });
+        // Publish cancellation event
+        await publishEventToExchange("order.cancel", {
+            orderId: order._id.toString(),
+            userId: userId.toString(),
+        });
 
+        return res.status(200).json({ message: "Order cancelled successfully." });
     } catch (error) {
         log.error("Error cancelling order:", error);
         return next(new ApiError("Failed to cancel order. Please try again later.", 500));
