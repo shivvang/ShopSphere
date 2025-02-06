@@ -7,6 +7,7 @@ import log from "./utils/logHandler.js";
 import connectDb from "./database/connect.js";
 import errorHandler from "./utils/errorHandler.js";
 import {customerRouter,addressRouter} from "./routes/router.js"
+import { consumeRabbitMQEvent, initializeRabbitMQ } from "./queue/rabbitmq.js";
 
 connectDb();
 
@@ -24,9 +25,25 @@ app.use("/api/customers",customerRouter);
 app.use("/api/addresses",addressRouter);
 
 
-app.listen(PORT,()=>{
-    log.info(`Customer service is running on ${PORT}`);
-})
+async function initializeCustomerService(){
+    try {
+        
+        await initializeRabbitMQ();
+
+        //consume events
+
+        await consumeRabbitMQEvent("some routing key",callbackfn());
+
+        app.listen(PORT,()=>{
+            log.info(`Customer service is running on ${PORT}`);
+        })
+    } catch (error) {
+        log.error("Failed to connect to server",error);
+        process.exit(1);
+    }
+}
+
+initializeCustomerService();
 
 process.on("unhandledRejection",(reason,promise)=>{
     log.error("unhandled Rejection at",promise,"reason",reason);

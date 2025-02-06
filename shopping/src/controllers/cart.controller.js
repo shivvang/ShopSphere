@@ -36,6 +36,13 @@ export const addItemToCart = async (req, res, next) => {
             }
         }
 
+        // Publish cart add  event
+        await publishEventToExchange("cart.add", {
+            userId: userId.toString(),
+            productId: productId,
+            quantity: quantity,
+        });
+
         await cart.save();
         return res.status(200).json({ success: true, message: "Item added to cart successfully", cart });
 
@@ -75,11 +82,14 @@ export const removeItemFromCart = async (req, res, next) => {
             return next(new ApiError("Product not found in cart", 404));
         }
 
+        let removeEntireProduct = false;
+
         // Reduce quantity or remove item
         if (existingItem.quantity > quantity) {
             log.info(`Reducing quantity of product ${productId} in cart`);
             existingItem.quantity -= quantity;
         } else {
+            removeEntireProduct = true;
             log.info(`Removing product ${productId} from cart`);
             cart.items = cart.items.filter(item => item.productId.toString() !== productId);
         }
@@ -87,6 +97,22 @@ export const removeItemFromCart = async (req, res, next) => {
         await cart.save();
 
         log.info(`Successfully updated cart for user: ${userId}`);
+
+        if (removeEntireProduct) {
+            //remove ihe product from cart 
+            await publishEventToExchange("cart.delete", {
+                userId: userId.toString(),
+                productId: productId,
+            });
+
+        }else{
+            await publishEventToExchange("cart.reduceQuantity", {
+                userId: userId.toString(),
+                productId: productId,
+                quantity: quantity,
+            });
+        }
+
         return res.status(200).json({ message: "Item removed successfully", cart });
 
     } catch (error) {
@@ -122,6 +148,12 @@ export const clearCart = async (req, res, next) => {
         await cart.save();
 
         log.info(`Cart cleared successfully for user: ${userId}`);
+
+        await publishEventToExchange("cart.delete", {
+            userId: userId.toString(),
+            all: true 
+        });
+
         return res.status(200).json({ message: "Cart cleared successfully" });
 
     } catch (error) {

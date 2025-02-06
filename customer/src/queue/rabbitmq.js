@@ -26,8 +26,44 @@ export async function initializeRabbitMQ() {
     }
 }
 
-async function consumeEvents(){
+export async function consumeRabbitMQEvent(routingKey, callback) {
+    try {
+        if (!routingKey || typeof routingKey !== "string") {
+            throw new Error("Invalid routingKey provided. It must be a non-empty string.");
+        }
+        if (typeof callback !== "function") {
+            throw new Error("Invalid callback function provided.");
+        }
 
+        if (!rabbitMqChannel) {
+            log.info("Initializing RabbitMQ connection...");
+            await initializeRabbitMQ();
+        }
+
+        log.info(`Setting up consumer for routing key: ${routingKey}`);
+
+        const queue = await rabbitMqChannel.assertQueue("", { exclusive: true });
+
+        await rabbitMqChannel.bindQueue(queue.queue, EXCHANGE_NAME, routingKey);
+
+        rabbitMqChannel.consume(queue.queue, (msg) => {
+            if (msg !== null) {
+                try {
+                    const content = JSON.parse(msg.content.toString());
+                    log.info(`Received message on routing key '${routingKey}':`, content);
+                    callback(content);
+                    rabbitMqChannel.ack(msg);
+                } catch (error) {
+                    log.error("Failed to process message:", error.message);
+                }
+            }
+        });
+
+        log.info(`Consumer successfully set up for routing key: ${routingKey}`);
+    } catch (error) {
+        log.error("Error in consumeRabbitMQEvent:", error.message);
+        throw error;
+    }
 }
 
-export {initializeRabbitMQ};
+export {initializeRabbitMQ,consumeRabbitMQEvent};
