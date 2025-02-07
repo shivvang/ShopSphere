@@ -5,8 +5,8 @@ import authenticatedRequest from "../middleware/authMiddleware.js";
 const cartRouter = express.Router();
 cartRouter.use(authenticatedRequest);
 
-cartRouter.post("/add", addItemToCart);
-cartRouter.post("/remove", removeItemFromCart);
+cartRouter.post("/add/:productId", addItemToCart);
+cartRouter.post("/remove/:productId", removeItemFromCart);
 cartRouter.put("/clear", clearCart);
 
 export default cartRouter

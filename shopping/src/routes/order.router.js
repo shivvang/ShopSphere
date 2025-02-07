@@ -5,7 +5,7 @@ import authenticatedRequest from "../middleware/authMiddleware.js";
 const orderRouter = express.Router();
 orderRouter.use(authenticatedRequest);
 
-orderRouter.post("/",setOrder);
-orderRouter.delete("/:productId",cancelOrder);
+orderRouter.post("/add/:productId",setOrder);
+orderRouter.delete("/remove/:productId",cancelOrder);
 
 export default orderRouter;

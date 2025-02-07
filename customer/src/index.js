@@ -8,6 +8,11 @@ import connectDb from "./database/connect.js";
 import errorHandler from "./utils/errorHandler.js";
 import {customerRouter,addressRouter} from "./routes/router.js"
 import { consumeRabbitMQEvent, initializeRabbitMQ } from "./queue/rabbitmq.js";
+import { addWishlistToCustomer, clearWishlistToCustomer, deleteWishlistToCustomer } from "./eventHandlers/wishlist.eventHandler.js";
+import { addCartToCustomer, clearCartToCustomer, deleteCartToCustomer } from "./eventHandlers/cart.eventHandler.js";
+import { addOrderToCustomer, deleteOrderToCustomer } from "./eventHandlers/order.eventHandler.js";
+
+
 
 connectDb();
 
@@ -32,7 +37,20 @@ async function initializeCustomerService(){
 
         //consume events
 
-        await consumeRabbitMQEvent("some routing key",callbackfn());
+        //wishlist
+        await consumeRabbitMQEvent("wishlist.itemAdded", addWishlistToCustomer);
+        await consumeRabbitMQEvent("wishlist.itemRemoved", deleteWishlistToCustomer);
+        await consumeRabbitMQEvent("wishlist.cleared", clearWishlistToCustomer);
+
+
+        //cart
+        await consumeRabbitMQEvent("cart.add", addCartToCustomer);
+        await consumeRabbitMQEvent("cart.reduceQuantity", deleteCartToCustomer);
+        await consumeRabbitMQEvent("cart.delete", clearCartToCustomer);
+
+        //order
+        await consumeRabbitMQEvent("order.place",addOrderToCustomer)
+        await consumeRabbitMQEvent("order.cancel",deleteOrderToCustomer);
 
         app.listen(PORT,()=>{
             log.info(`Customer service is running on ${PORT}`);

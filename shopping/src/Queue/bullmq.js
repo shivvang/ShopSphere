@@ -1,6 +1,6 @@
 import {Queue} from "bullmq";
 
-const deilveryQueue = new Queue("",{
+const deliveryQueue = new Queue("",{
     connection:{
         host:process.env.REDIS_HOST,
         port:process.env.REDIS_PORT,
@@ -8,4 +8,4 @@ const deilveryQueue = new Queue("",{
     }
 });
 
-export {deilveryQueue}
+export {deliveryQueue}
