@@ -2,6 +2,10 @@ import {Product} from "../Database/Database.js";
 import { validateAddProduct, validateSearchFilters, validateUpdateProduct } from "../validators/productValidator.js";
 import {ApiError} from "../utils/ApiError.js";
 import log from "../utils/logHandler.js";
+import { deleteUploadedFile, getSignedUploadUrl } from "../S3/s3Service.js";
+import axios from "axios";
+import path from "path";
+
 
 // **Create a new product**
 export const createProduct = async (req, res, next) => {
@@ -71,7 +75,13 @@ export const deleteProduct = async (req, res, next) => {
       return next(new ApiError(404, "Product not found."));
     }
 
+    if (productToDelete?.imageUrl) {
+      const fileName = productToDelete.imageUrl.split("/").pop();
+      await deleteUploadedFile(fileName);
+    }
+
     await Product.findByIdAndDelete(productId);
+
 
     log.info(`Product ${productId} deleted successfully.`);
 
@@ -193,5 +203,50 @@ export const updateProduct = async (req, res, next) => {
   } catch (error) {
     log.error("Error updating product:", error);
     return next(new ApiError(500, "Something went wrong while updating the product.", error));
+  }
+};
+
+export const uploadFileAndGetUrl = async (req, res) => {
+  log.info("File upload initiated...");
+
+  try {
+    if (!req.file) {
+      log.warn("No file provided in request");
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const filename = req.file.originalname;
+    const fileKey = path.parse(filename).name; 
+    const mimeType = req.file.mimetype; 
+
+    log.info(`Processing file: ${filename} | MIME Type: ${mimeType}`);
+
+  
+    const uploadUrl = await getSignedUploadUrl(fileKey, mimeType);
+
+    log.info(`Generated signed upload URL: ${uploadUrl}`);
+
+    
+    const response = await axios.put(uploadUrl, req.file.buffer, {
+      headers: {
+        "Content-Type": mimeType, 
+        "Content-Length": req.file.size,
+      },
+    });
+
+    log.info(`File uploaded successfully, S3 Response: ${response.status}`);
+
+    // ✅ Get Signed Download URL
+    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+
+    log.info(` download URL: ${fileUrl}`);
+
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      fileUrl,
+    });
+  } catch (error) {
+    log.error("File upload error:", error);
+    return res.status(500).json({ error: "File upload failed" });
   }
 };
