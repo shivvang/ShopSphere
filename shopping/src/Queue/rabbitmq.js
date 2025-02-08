@@ -7,7 +7,7 @@ let rabbitMqChannel = null;
 
 const EXCHANGE_NAME = "orders_exchange"; 
 
-export async function initializeRabbitMQ() {
+async function initializeRabbitMQ() {
     try {
         log.info("Connecting to RabbitMQ...");
         rabbitMqConnection = await amqplib.connect(process.env.RABBITMQ_URL);

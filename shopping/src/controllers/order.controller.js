@@ -8,7 +8,7 @@ export const setOrder = async (req, res, next) => {
     log.info("setOrder entry point hit");
 
     try {
-        const userId = req.userId;
+        const userId = req.user;
         const productId = req.params.productId;
         const { name, imageUrl, priceAtPurchase, quantity } = req.body;
 
@@ -46,7 +46,7 @@ export const setOrder = async (req, res, next) => {
         //     removeOnFail: false,
         // });
 
-        await publishEventToExchange("order.place", { userId, productId, quantity });
+        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
 
         log.info(`Order processing event published for order: ${order._id}`);
         return res.status(201).json({ message: "Order placed successfully", order });
@@ -61,7 +61,7 @@ export const cancelOrder = async (req, res, next) => {
     log.info("Cancel order endpoint hit...");
     
     try {
-        const userId = req.userId;
+        const userId = req.user;
         const productId = req.params.productId;
 
         if (!userId || !productId) {
@@ -92,7 +92,7 @@ export const cancelOrder = async (req, res, next) => {
         // const jobId = order._id.toString();
         // await deliveryQueue.getJob(jobId).then(job => job?.remove());
 
-        await publishEventToExchange("order.cancel", { userId, productId, quantity });
+        await publishEventToExchange("order.cancel", { userId, productId });
 
         return res.status(200).json({ message: "Order cancelled successfully.", order });
     } catch (error) {

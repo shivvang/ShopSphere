@@ -1,4 +1,5 @@
 import Cart from "../database/models/Cart.model.js";
+import { publishEventToExchange } from "../Queue/rabbitmq.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
 
@@ -6,7 +7,7 @@ import log from "../utils/logHandler.js"
 export const addItemToCart = async (req, res, next) => {
     log.info("Add to cart endpoint hit");
     try {
-        const userId = req.userId;
+        const userId = req.user;
         const productId = req.params.productId;
         const { name, imageUrl, price, quantity } = req.body;
 
@@ -36,7 +37,7 @@ export const addItemToCart = async (req, res, next) => {
         }
 
         await cart.save();
-        await publishEventToExchange("cart.add", { userId, productId, quantity });
+        await publishEventToExchange("cart.add", { userId, productId, quantity,name, imageUrl, price });
 
         return res.status(200).json({ success: true, message: "Item added to cart successfully", cart });
     } catch (error) {
@@ -49,7 +50,7 @@ export const addItemToCart = async (req, res, next) => {
 export const removeItemFromCart = async (req, res, next) => {
     log.info("Remove item from cart endpoint hit");
     try {
-        const userId = req.userId;
+        const userId = req.user;
         const productId = req.params.productId;
         const { quantity } = req.body;
 
@@ -77,7 +78,7 @@ export const removeItemFromCart = async (req, res, next) => {
         } else {
             log.info(`Removing product ${productId} from cart`);
             cart.items = cart.items.filter(item => item.productId.toString() !== productId);
-            await publishEventToExchange("cart.delete", { userId, productId });
+            await publishEventToExchange("cart.reduceQuantity", { userId, productId ,quantity});
         }
 
         await cart.save();
@@ -91,7 +92,7 @@ export const removeItemFromCart = async (req, res, next) => {
 export const clearCart = async (req, res, next) => {
     log.info("Clear cart endpoint hit");
     try {
-        const userId = req.userId;
+        const userId = req.user;
         if (!userId) {
             log.warn("User ID is missing in request");
             return next(new ApiError("User authentication required", 401));

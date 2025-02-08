@@ -7,7 +7,7 @@ let rabbitMqChannel = null;
 
 const EXCHANGE_NAME = "orders_exchange"; 
 
-export async function initializeRabbitMQ() {
+async function initializeRabbitMQ() {
     try {
         log.info("Connecting to RabbitMQ...");
         rabbitMqConnection = await amqplib.connect(process.env.RABBITMQ_URL);
@@ -17,7 +17,7 @@ export async function initializeRabbitMQ() {
         rabbitMqChannel = await rabbitMqConnection.createChannel();
         await rabbitMqChannel.assertExchange(EXCHANGE_NAME, "topic", { durable: true });
 
-        log.info(`Exchange "${EXCHANGE_NAME}" set up successfully.`);
+        //log.info(`Exchange "${EXCHANGE_NAME}" set up successfully.`);
 
         return rabbitMqChannel;
     } catch (error) {
@@ -26,7 +26,7 @@ export async function initializeRabbitMQ() {
     }
 }
 
-export async function consumeRabbitMQEvent(routingKey, callback) {
+async function consumeRabbitMQEvent(routingKey, callback) {
     try {
         if (!routingKey || typeof routingKey !== "string") {
             throw new Error("Invalid routingKey provided. It must be a non-empty string.");
@@ -40,7 +40,7 @@ export async function consumeRabbitMQEvent(routingKey, callback) {
             await initializeRabbitMQ();
         }
 
-        log.info(`Setting up consumer for routing key: ${routingKey}`);
+        //log.info(`Setting up consumer for routing key: ${routingKey}`);
 
         const queue = await rabbitMqChannel.assertQueue("", { exclusive: true });
 
@@ -59,7 +59,7 @@ export async function consumeRabbitMQEvent(routingKey, callback) {
             }
         });
 
-        log.info(`Consumer successfully set up for routing key: ${routingKey}`);
+        //log.info(`Consumer successfully set up for routing key: ${routingKey}`);
     } catch (error) {
         log.error("Error in consumeRabbitMQEvent:", error.message);
         throw error;

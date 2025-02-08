@@ -1,12 +1,11 @@
-import Customer from "../models/customerModel.js";
+import Customer from "../database/models/customer.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { log } from "../utils/logger.js";
-
+import log from "../utils/logHandler.js"
 
 export const addOrderToCustomer = async(event)=>{
     log.info("Adding product to Order...", { event });
     try {
-        const { userId, productId, quantity } = event;
+        const { userId, productId, quantity,name, imageUrl, priceAtPurchase} = event;
 
         if (!userId || !productId || !quantity) {
             log.error("Missing userId, productId, or quantity in request", { userId, productId, quantity });
@@ -24,12 +23,12 @@ export const addOrderToCustomer = async(event)=>{
         if (existingItem) {
             existingItem.quantity = quantity;
         } else {
-            customer.orders.push({ productId, quantity });
+            customer.orders.push({ productId, quantity ,name, imageUrl, priceAtPurchase });
         }
 
         await customer.save();
 
-        log.info("Product added to Order successfully", { userId, productId, quantity });
+        log.info("Product added to Order successfully", { userId, productId, quantity ,name, imageUrl, priceAtPurchase });
 
     } catch (error) {
         log.error("Error adding product to cart", { error: error.message, stack: error.stack });
@@ -48,18 +47,17 @@ export const deleteOrderToCustomer = async(event)=>{
         }
 
         const customer = await Customer.findById(userId);
+
         if (!customer) {
             log.warn("Customer not found", { userId });
             throw new ApiError(404, "Customer not found.");
         }
 
-        const initialLength = customer.orders.length;
-        customer.cart = customer.orders.filter(item => !item.productId.equals(productId));
-
-        if (customer.orders.length === initialLength) {
-            log.warn("Product not found in cart", { userId, productId });
-            throw new ApiError(404, "Product not found in cart.");
-        }
+        customer.orders.map(item => {
+            if (item.productId.toString() === productId) {
+                item.status = "cancelled";
+            }
+        });
 
         await customer.save();
 

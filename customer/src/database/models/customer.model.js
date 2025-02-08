@@ -28,16 +28,28 @@ const customerSchema = new mongoose.Schema(
       cart: [
         {
           productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+          name: String,
+          imageUrl: String,
+          price: Number,
           quantity: { type: Number, required: true, min: 1 },
         }
       ],
       wishlist: [
-        { productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true } }
+        { 
+          productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+          name: String,
+          imageUrl: String,
+          price: Number,
+        }
       ],
       orders: [
         {
           productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
           quantity: { type: Number, required: true, min: 1 },
+          name: String,
+          imageUrl: String,
+          priceAtPurchase: Number,
+          status: { type: String, enum: ["pending", "shipped", "delivered", "cancelled"], default: "pending" },
         }
       ],
     },

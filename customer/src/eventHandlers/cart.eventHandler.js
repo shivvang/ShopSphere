@@ -1,11 +1,11 @@
-import Customer from "../models/customerModel.js";
+import Customer from "../database/models/customer.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { log } from "../utils/logger.js";
+import log from "../utils/logHandler.js"
 
 export const addCartToCustomer = async (event) => {
     log.info("Adding product to cart...", { event });
     try {
-        const { userId, productId, quantity } = event;
+        const { userId, productId, quantity,name, imageUrl, price } = event;
 
         if (!userId || !productId || !quantity) {
             log.error("Missing userId, productId, or quantity in request", { userId, productId, quantity });
@@ -23,12 +23,12 @@ export const addCartToCustomer = async (event) => {
         if (existingItem) {
             existingItem.quantity = quantity;
         } else {
-            customer.cart.push({ productId, quantity });
+            customer.cart.push({ productId, quantity,name, imageUrl, price });
         }
 
         await customer.save();
 
-        log.info("Product added to cart successfully", { userId, productId, quantity });
+        log.info("Product added to cart successfully", { userId, productId, quantity ,name, imageUrl, price});
 
     } catch (error) {
         log.error("Error adding product to cart", { error: error.message, stack: error.stack });
@@ -39,9 +39,9 @@ export const addCartToCustomer = async (event) => {
 export const deleteCartToCustomer = async (event) => {
     log.info("Deleting product from cart...", { event });
     try {
-        const { userId, productId } = event;
+        const { userId, productId,quantity} = event;
 
-        if (!userId || !productId) {
+        if (!userId || !productId || quantity > 0) {
             log.error("Missing userId or productId in request", { userId, productId });
             throw new ApiError(400, "User ID and Product ID are required.");
         }

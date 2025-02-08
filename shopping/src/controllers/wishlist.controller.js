@@ -7,7 +7,7 @@ export const addToWishlist = async (req, res, next) => {
     log.info("Received request to add product to wishlist");
 
     try {
-        const userId = req.userId;
+        const userId = req.user;
         const productId = req.params.productId;
         const { name, imageUrl, price } = req.body;
 
@@ -38,7 +38,7 @@ export const addToWishlist = async (req, res, next) => {
             log.info(`Added product ${productId} to wishlist for user: ${userId}`);
         }
 
-        await publishEventToExchange("wishlist.itemAdded", { userId: userId.toString(), productId: productId.toString() });
+        await publishEventToExchange("wishlist.itemAdded", { userId,productId,name, imageUrl, price});
         await wishlist.save();
         return res.status(201).json({ message: "Product successfully added to wishlist" });
     } catch (error) {
@@ -52,7 +52,7 @@ export const removeFromWishlist = async (req, res, next) => {
     log.info("Received request to remove product from wishlist");
 
     try {
-        const userId = req.userId;
+        const userId = req.user;
         const productId = req.params.productId;
 
         if (!userId || !productId) {
@@ -92,7 +92,7 @@ export const clearWishlist = async (req, res, next) => {
     log.info("Received request to clear wishlist");
 
     try {
-        const userId = req.userId;
+        const userId = req.user;
 
         if (!userId) {
             log.warn("User ID is missing from request");
