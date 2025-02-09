@@ -7,6 +7,10 @@ import log from "./utils/logHandler.js";
 import connectDb from "./database/connect.js";
 import errorHandler from "./utils/errorHandler.js";
 import {cartRouter,orderRouter,wishlistRouter} from "./routes/router.js";
+import { consumeRabbitMQEvent, initializeRabbitMQ } from "./Queue/rabbitmq.js";
+import { handleProductDeletion, handleProductUpdation } from "./eventHandlers/product.eventHandler.js";
+import { handleUserDeletion } from "./eventHandlers/user.eventHandler.js";
+
 
 connectDb();
 
@@ -24,9 +28,32 @@ app.use("/api/cart", cartRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/orders", orderRouter);
 
-app.listen(PORT,()=>{
-    log.info(`Shopping service is running on ${PORT}`);
-})
+
+async function initializeShoppingService(){
+   try {
+
+    await initializeRabbitMQ();
+
+    //Products updates
+    await consumeRabbitMQEvent("product.delete",handleProductDeletion);
+
+    await consumeRabbitMQEvent("product.update",handleProductUpdation);
+
+    //user updates
+    await consumeRabbitMQEvent("user.delete",handleUserDeletion);
+
+    app.listen(PORT,()=>{
+        log.info(`Shopping service is running on ${PORT}`);
+    })
+
+   } catch (error) {
+     log.error("Failed to connect to server",error);
+     process.exit(1);
+   } 
+}
+
+
+initializeShoppingService();
 
 process.on("unhandledRejection",(reason,promise)=>{
     log.error("unhandled Rejection at",promise,"reason",reason);

@@ -11,6 +11,7 @@ import { consumeRabbitMQEvent, initializeRabbitMQ } from "./queue/rabbitmq.js";
 import { addWishlistToCustomer, clearWishlistToCustomer, deleteWishlistToCustomer } from "./eventHandlers/wishlist.eventHandler.js";
 import { addCartToCustomer, clearCartToCustomer, deleteCartToCustomer } from "./eventHandlers/cart.eventHandler.js";
 import { addOrderToCustomer, deleteOrderToCustomer } from "./eventHandlers/order.eventHandler.js";
+import { handleProductDeletion, handleProductUpdation } from "./eventHandlers/product.eventHandler.js";
 
 
 
@@ -51,6 +52,11 @@ async function initializeCustomerService(){
         //order
         await consumeRabbitMQEvent("order.place",addOrderToCustomer)
         await consumeRabbitMQEvent("order.cancel",deleteOrderToCustomer);
+
+
+        //Product
+        await consumeRabbitMQEvent("product.delete",handleProductDeletion);
+        await consumeRabbitMQEvent("product.update",handleProductUpdation);
 
         app.listen(PORT,()=>{
             log.info(`Customer service is running on ${PORT}`);

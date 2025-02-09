@@ -10,7 +10,6 @@ const productSchema = new mongoose.Schema(
     discount: { type: Number, default: 0, min: 0, max: 100 },
     category: { type: String, required: true, trim: true },
     brand: { type: String, required: true, trim: true },
-    ratings: { type: Number, default: 0, min: 0, max: 5 },
     tags: [{ type: String, lowercase: true, trim: true }],
     searchKeywords: [{ type: String, lowercase: true, trim: true }],
   },

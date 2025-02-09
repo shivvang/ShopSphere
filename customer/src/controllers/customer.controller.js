@@ -265,6 +265,8 @@ export const deleteCustomer = async (req, res, next) => {
             return next(new ApiError("Customer not found", 404));
         }
 
+        await publishEventToExchange("user.delete",{userId});
+
        
         await Customer.deleteOne({ _id: userId });
         log.info(`Customer with ID ${userId} successfully deleted.`);

@@ -26,6 +26,24 @@ async function initializeRabbitMQ() {
     }
 }
 
+
+async function publishEventToExchange(routingKey,message){
+    try {
+        if(!rabbitMqChannel) {
+            await initializeRabbitMQ();
+        }
+
+        const messageBuffer = Buffer.from(JSON.stringify(message));
+
+        rabbitMqChannel.publish(EXCHANGE_NAME,routingKey,messageBuffer);
+
+        log.info(`📤 Event published to exchange: "${EXCHANGE_NAME}" | Routing Key: "${routingKey}"`);
+
+    } catch (error) {
+        log.error(`❌ Failed to publish event to RabbitMQ | Routing Key: "${routingKey}"`, error);
+    }
+}
+
 async function consumeRabbitMQEvent(routingKey, callback) {
     try {
         if (!routingKey || typeof routingKey !== "string") {
@@ -66,4 +84,4 @@ async function consumeRabbitMQEvent(routingKey, callback) {
     }
 }
 
-export {initializeRabbitMQ,consumeRabbitMQEvent};
+export {initializeRabbitMQ,publishEventToExchange,consumeRabbitMQEvent};

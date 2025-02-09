@@ -18,7 +18,7 @@ export const createProduct = async (req, res, next) => {
       return next(new ApiError(400, "Invalid product data", error.details));
     }
 
-    const { name, description, imageUrl, stock, price, discount, category, brand, ratings, tags, searchKeywords } = req.body;
+    const { name, description, imageUrl, stock, price, discount, category, brand, tags, searchKeywords } = req.body;
 
     // Check if the product already exists
     const existingProduct = await Product.findOne({ name, description, category, brand });
@@ -37,7 +37,6 @@ export const createProduct = async (req, res, next) => {
       discount,
       category,
       brand,
-      ratings,
       tags,
       searchKeywords,
     });
@@ -79,6 +78,10 @@ export const deleteProduct = async (req, res, next) => {
       const fileName = productToDelete.imageUrl.split("/").pop();
       await deleteUploadedFile(fileName);
     }
+
+    //let other services know this product doesnt exist anymore
+    
+    await publishEventToExchange("product.delete",{productId});
 
     await Product.findByIdAndDelete(productId);
 
@@ -182,19 +185,20 @@ export const updateProduct = async (req, res, next) => {
     }
 
     // Update product fields
-    const { name, description, imageUrl, stock, price, discount, category, brand, ratings, tags, searchKeywords } = req.body;
+    const { description, imageUrl, price, discount, tags } = req.body;
 
-    if (name) product.name = name;
     if (description) product.description = description;
     if (imageUrl) product.imageUrl = imageUrl;
-    if (stock !== undefined) product.stock = stock;
     if (price !== undefined) product.price = price;
     if (discount !== undefined) product.discount = discount;
-    if (category) product.category = category;
-    if (brand) product.brand = brand;
-    if (ratings !== undefined) product.ratings = ratings;
     if (tags) product.tags = tags;
-    if (searchKeywords) product.searchKeywords = searchKeywords;
+
+    const updatePayload = { productId }; 
+
+    if (imageUrl) updatePayload.imageUrl = imageUrl;
+    if (price !== undefined) updatePayload.price = price;
+
+    publishEventToExchange("product.update", updatePayload);
 
     await product.save();
 
@@ -248,5 +252,37 @@ export const uploadFileAndGetUrl = async (req, res) => {
   } catch (error) {
     log.error("File upload error:", error);
     return res.status(500).json({ error: "File upload failed" });
+  }
+};
+
+
+export const removeImageFromAWS = async (req, res, next) => {
+  log.info("Request received to delete image from AWS");
+
+  try {
+    const { imageUrl } = req.body; 
+
+    if (!imageUrl) {
+      log.warn("Image URL is missing in request body");
+      return res.status(400).json({
+        success: false,
+        message: "Image URL is required for deletion",
+      });
+    }
+
+    const fileKey = imageUrl.split("/").pop(); 
+
+    await deleteUploadedFile(fileKey); 
+
+    log.info(`Image deleted successfully from AWS: ${fileKey}`);
+
+    res.status(200).json({
+      success: true,
+      message: "Image deleted successfully from AWS",
+    });
+
+  } catch (error) {
+    log.error("Failed to delete image from AWS:", error);
+    next(new ApiError(500, "Error occurred while deleting the image from AWS"));
   }
 };
