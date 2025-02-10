@@ -1,0 +1,16 @@
+
+# Always pulls the latest Node.js Alpine version
+FROM node:alpine  
+
+
+# Corrected directory
+WORKDIR /usr/src/app  
+
+COPY package*.json ./ 
+
+RUN npm ci --only=production  # Install only production dependencies
+
+COPY . .  
+
+EXPOSE 8001  
+
