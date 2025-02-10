@@ -9,7 +9,7 @@ const orderSchema = new Schema({
       imageUrl: String,
       priceAtPurchase: Number,
       quantity: Number,
-      status: { type: String, enum: ["pending", "shipped", "delivered", "cancelled"], default: "pending" },
+      status: { type: String, enum: [ "shipped", "delivered", "cancelled"], default: "shipped" },
     }
   ],
 }, { timestamps: true });

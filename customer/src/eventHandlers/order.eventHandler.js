@@ -67,3 +67,42 @@ export const deleteOrderToCustomer = async(event)=>{
         throw new ApiError(500, error.message);
     }
 }    
+
+export const processOrder = async (event) => {
+    log.info(`Processing order event: ${JSON.stringify(event)}`);
+
+    try {
+        const { userId, productId } = event;
+
+        if (!userId || !productId) {
+            log.warn("Missing required fields: userId or productId", { userId, productId });
+            throw new ApiError(400, "Invalid request: userId and productId are required.");
+        }
+
+        const customer = await Customer.findById(userId);
+
+        if (!customer) {
+            log.warn(`Customer not found: ${userId}`);
+            throw new ApiError(404, "Customer not found.");
+        }
+
+        const existingItem = customer.orders.find(order => order.productId.equals(productId));
+        
+        if (!existingItem) {
+            log.warn(`Order not found for Product: ${productId} in User: ${userId}'s order history`);
+            throw new ApiError(404, "Order not found for the specified product.");
+        }
+
+        existingItem.status = "delivered";
+        await customer.save();
+
+        log.info(`Order for Product: ${productId} marked as delivered for User: ${userId}`);
+
+    } catch (error) {
+        log.error(`Error processing order for User: ${event.userId}`, { 
+            error: error.message, 
+            stack: error.stack 
+        });
+        throw new ApiError(error.statusCode || 500, error.message || "Internal Server Error");
+    }
+};

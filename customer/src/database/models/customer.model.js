@@ -49,7 +49,7 @@ const customerSchema = new mongoose.Schema(
           name: String,
           imageUrl: String,
           priceAtPurchase: Number,
-          status: { type: String, enum: ["pending", "shipped", "delivered", "cancelled"], default: "pending" },
+          status: { type: String, enum: ["shipped", "delivered", "cancelled"], default: "shipped" },
         }
       ],
     },

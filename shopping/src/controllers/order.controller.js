@@ -31,20 +31,24 @@ export const setOrder = async (req, res, next) => {
         } else {
             order = new Order({
                 userId,
-                items: [{ productId, name, imageUrl, priceAtPurchase, quantity }],
+                items: [{ productId, name, imageUrl, priceAtPurchase, quantity}],
             });
         }
 
         await order.save();
-        // log.info(`New order created: ${order._id}`);
 
-        // const jobData = { orderId: order._id, userId, productId, priceAtPurchase, quantity };
-        // await deliveryQueue.add("processOrder", jobData, {
-        //     jobId: order._id.toString(),
-        //     delay: 0,
-        //     removeOnComplete: true,
-        //     removeOnFail: false,
-        // });
+        log.info(`New order created For User ${userId} and Product ordered ${productId}`);
+
+        const delay = Date.now() + 7 * 24 * 60 * 60 * 1000;//in milli seconds
+
+        const jobData = {userId, productId, priceAtPurchase, quantity };
+
+        await deliveryQueue.add("processOrder", jobData, {
+            jobId: userId._id.toString(),
+            delay:delay ,
+            removeOnComplete: true,
+            removeOnFail: false,
+        });
 
         await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
 
