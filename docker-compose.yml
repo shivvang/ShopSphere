@@ -14,7 +14,6 @@ services:
     env_file: ./customer/.env
     depends_on:
       - rabbitmq
-      - mongodb
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
 
@@ -23,7 +22,6 @@ services:
     env_file: ./product/.env
     depends_on:
       - rabbitmq
-      - mongodb
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
 
@@ -33,31 +31,24 @@ services:
     depends_on:
       - rabbitmq
       - redis
-      - mongodb
     environment:
       - RABBITMQ_URL=amqp://rabbitmq:5672
-      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
 
   redis:
-    image: redis:latest
-    restart: always
+    image: redis:alpine
     ports:
       - "6379:6379"
 
   rabbitmq:
-    image: rabbitmq:management
-    restart: always
+    image: rabbitmq:3-management
     ports:
       - "5672:5672"
       - "15672:15672"
-
-  mongodb:
-    image: mongo:latest
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5

@@ -1,4 +1,4 @@
-import {Product} from "../Database/Database.js";
+import {Product} from "../database/Database.js";
 import { validateAddProduct, validateSearchFilters, validateUpdateProduct } from "../validators/productValidator.js";
 import {ApiError} from "../utils/ApiError.js";
 import log from "../utils/logHandler.js";
