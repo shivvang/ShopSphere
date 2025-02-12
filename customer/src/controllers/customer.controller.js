@@ -16,7 +16,7 @@ export const customerRegister = async (req, res, next) => {
             });
         }
 
-        const { email, password, phone } = req.body;
+        const { phone, email, password} = req.body;
 
      
         const existingCustomer = await Customer.findOne({ $or: [{ email }, { phone }] });
