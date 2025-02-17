@@ -19,7 +19,7 @@ function Login() {
       const result = await login({...formData,setFormData});
 
       if (result.success) {
-        navigate("/auth/login");
+        navigate("/home");
       } else {
         setError(result.error);
       }

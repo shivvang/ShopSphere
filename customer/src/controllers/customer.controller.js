@@ -96,8 +96,8 @@ export const customerLogin = async (req, res, next) => {
         // Set secure cookies
         const options = {
             httpOnly: true,
-            secure: true,
-            sameSite: "Strict",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
         };
 
         return res

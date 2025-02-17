@@ -14,7 +14,7 @@ export const register = async ({ phone, email, password, setFormData }) => {
 
   try {
     const response = await axios.post(`${authRoute}register`, {
-      phone: Number(phone),
+      phone:phone,
       email,
       password,
     });
@@ -39,7 +39,9 @@ export const login = async({email,password,setFormData})=>{
   if (password.length < 6) return { error: "Password must be at least 6 characters long." };
 
   try {
-    const response = await axios.post(`${authRoute}/login`,{email,password});
+    const response = await axios.post(`${authRoute}login`,{email,password},{
+      withCredentials: true,
+    });
 
     if (!response.data.success) return { error: response.data.message || "Registration failed." };
 
