@@ -22,7 +22,13 @@ const app = express();
 //middlewares
 
 app.use(express.json())
-app.use(cors());
+const corsOptions = {
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  };
+  
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(helmet());
 app.use(cookieparser());
 app.use(errorHandler);

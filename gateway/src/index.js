@@ -33,10 +33,15 @@ const apiRateLimiter = rateLimit({
 
 app.use(helmet());
 app.use(express.json());
-app.use(cors({
+const corsOptions = {
     origin: process.env.FRONTEND_URL,  
-    credentials: true,  
-  }));
+    credentials: true,                 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type"], 
+  };
+  
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); 
 
 app.use(cookieparser());
 app.use(errorHandler);
@@ -65,14 +70,10 @@ app.use("/v1/customers",proxy(process.env.CUSTOMER_SERVICE_URL,{
     ...proxyOptions,
     proxyReqOptDecorator:(proxyReqOpts,srcReq)=>{
         proxyReqOpts.headers["Content-Type"] = "application/json";
-        proxyReqOpts.headers["Access-Control-Allow-Origin"] = process.env.FRONTEND_URL;
-        proxyReqOpts.headers["Access-Control-Allow-Credentials"] = "true";
         return proxyReqOpts;
     },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
         log.info(`Response received from Customer service : ${proxyRes.statusCode}`);
-        userRes.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
-        userRes.setHeader("Access-Control-Allow-Credentials", "true");
         return proxyResData;
     }
 }))

@@ -284,3 +284,85 @@ export const deleteCustomer = async (req, res, next) => {
         return next(new ApiError("Internal Server Error", 500));
     }
 };
+
+
+export const customerWishlist = async(req,res,next)=>{
+    log.info("Fetching customer wishlist...");
+
+    try {
+        const  userId  = req.user.userId; 
+
+       
+        const customer = await Customer.findById(userId).select("wishlist");
+
+        // Check if user exists
+        if (!customer) {
+            log.warn("Customer not found!");
+            return res.status(404).json({ message: "Customer not found" ,success: false});
+        }
+
+        // Send wishlist or empty array
+        res.status(200).json({
+            success : true,
+            wishlist: customer.wishlist || []
+        });
+
+    } catch (error) {
+        log.error("Error fetching wishlist:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+}
+
+export const customerCart = async(req,res,next)=>{
+    log.info("Fetching customer cart...");
+
+    try {
+        const  userId  = req.user.userId; 
+
+       
+        const customer = await Customer.findById(userId).select("cart");
+
+        // Check if user exists
+        if (!customer) {
+            log.warn("Customer not found!");
+            return res.status(404).json({ message: "Customer not found",success: false });
+        }
+
+        // Send wishlist or empty array
+        res.status(200).json({
+            success : true,
+            cart: customer.cart || []
+        });
+
+    } catch (error) {
+        log.error("Error fetching cart:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+}
+
+export const customerOrders = async(req,res,next)=>{
+    log.info("Fetching customer Orders...");
+
+    try {
+        const  userId  = req.user.userId; 
+
+       
+        const customer = await Customer.findById(userId).select("orders");
+
+        // Check if user exists
+        if (!customer) {
+            log.warn("Customer not found!");
+            return res.status(404).json({ message: "Customer not found" ,success: false});
+        }
+
+        // Send wishlist or empty array
+        res.status(200).json({
+            success : true,
+            orders: customer.orders || []
+        });
+
+    } catch (error) {
+        log.error("Error fetching orders:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+}

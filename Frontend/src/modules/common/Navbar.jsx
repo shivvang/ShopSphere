@@ -1,9 +1,12 @@
+import {useNavigate} from "react-router-dom";
 
 function Navbar() {
+  const navigate = useNavigate();
+
     return (
       <nav className="flex items-center justify-between p-4 bg-[#FF6F00] text-white">
         
-        <h1 className="text-2xl font-bold">ShopSphere</h1>
+        <h1 className="text-2xl font-bold" onClick={()=>navigate("/home")}>ShopSphere</h1>
   
        
         <div className="flex-grow mx-4">
@@ -15,7 +18,8 @@ function Navbar() {
         </div>
   
             
-        <button className="px-4 py-2 bg-white text-[#FF6F00] font-semibold rounded-lg hover:bg-gray-200">
+        <button className="px-4 py-2 bg-white text-[#FF6F00] font-semibold rounded-lg hover:bg-gray-200"
+        onClick={()=>navigate("/profile")}>
           My Profile
         </button>
       </nav>

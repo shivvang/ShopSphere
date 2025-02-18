@@ -1,6 +1,7 @@
 import express from "express";
-import { customerLogin, customerLogout, customerRegister, deleteCustomer, resetPassword, resetToken } from "../controllers/customer.controller.js";
+import { customerCart, customerLogin, customerLogout, customerOrders, customerRegister, customerWishlist, deleteCustomer, resetPassword, resetToken } from "../controllers/customer.controller.js";
 import verifyRefreshTokenMiddleware from "../middleware/verifyRefreshToken.js";
+import validatetoken from "../middleware/authenticateUser.js";
 
 const customerRouter = express.Router();
 
@@ -13,5 +14,10 @@ customerRouter.patch("/reset-password", verifyRefreshTokenMiddleware,resetPasswo
 customerRouter.post("/logout", verifyRefreshTokenMiddleware,customerLogout); 
 customerRouter.delete("/delete", verifyRefreshTokenMiddleware, deleteCustomer);
 
+
+//shopping
+customerRouter.get("/wishlist", validatetoken,customerWishlist);
+customerRouter.get("/cart",validatetoken, customerCart);
+customerRouter.get("/orders", validatetoken,customerOrders);
 
 export default customerRouter;
