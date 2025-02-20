@@ -1,13 +1,10 @@
 import { Link, Outlet } from "react-router-dom";
-import Navbar from "../modules/common/Navbar";
+
 
 export default function Profile() {
   return (
     <div className="flex flex-col h-screen">
-      
-      <Navbar/>
-
-     
+    
       <div className="flex flex-1">
        
       <aside className="w-1/4 bg-white p-6 border-r border-gray-300">
