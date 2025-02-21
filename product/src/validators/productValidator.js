@@ -111,7 +111,7 @@ export const validateSearchFilters = (data) => {
 
     sortOrder: Joi.string()
       .trim()
-      .valid("asc", "desc")
+      .valid("price_asc", "price_desc")
       .optional()
       .messages({
         "any.only": "Sort order must be 'asc' (ascending) or 'desc' (descending).",

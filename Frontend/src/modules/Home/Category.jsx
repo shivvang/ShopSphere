@@ -1,4 +1,4 @@
-const temp =[
+const categories =[
     {
         id:1,
         category:"kilos",
@@ -39,8 +39,15 @@ const temp =[
 
 function Category() {
   return (
-    <div className="flex items-center justify-evenly">
-        {temp.map((item)=><span key={item.id}>{item.category}</span>)}
+    <div className="w-full overflow-x-auto whitespace-nowrap flex gap-4 py-2 px-2 md:flex-wrap md:justify-center">
+      {categories.map((item) => (
+        <span
+          key={item.id}
+          className="bg-[#FF6F00] text-white px-4 py-2 rounded-md shadow-md cursor-pointer hover:bg-[#e65c00] transition"
+        >
+          {item.category}
+        </span>
+      ))}
     </div>
   )
 }

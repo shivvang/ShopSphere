@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainContent from "../modules/Search/MainContent"
 import SearchFilter from "../modules/Search/SearchFilter"
 
@@ -15,8 +15,12 @@ function Search({searchQuery}) {
       discount:"",
       price:"",
       rating:"",
-      sortOrder: "desc"
+      sortOrder: "price_desc"
     })
+
+    useEffect(() => {
+      setSearchFilter((prevfilter)=>({...prevfilter,searchQuery:searchQuery}))
+    },[searchQuery])
 
     console.log("search filter here ",searchFilter);
 
@@ -24,14 +28,11 @@ function Search({searchQuery}) {
 
 
   console.log("products found here are",products);
-
   return (
-    <div className="flex flex-col h-screen w-screen">
-    <div className="flex py-4 px-44 gap-2 overflow-x-hidden">
-        <SearchFilter searchFilter={searchFilter} setSearchFilter={setSearchFilter} setProducts={setProducts}/>
-        <MainContent products={products}/>
+    <div className="flex flex-col md:flex-row py-4 px-4 md:px-10 lg:px-44 gap-4  min-h-screen">
+      <SearchFilter searchFilter={searchFilter} setSearchFilter={setSearchFilter} setProducts={setProducts} />
+      <MainContent products={products} />
     </div>
-   </div>
   )
 }
 
