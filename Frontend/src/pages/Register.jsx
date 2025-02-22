@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom"
 import { register } from "../services/useAuth.js";
+import { StoreIcon } from "lucide-react";
 
 function Register() {
   const navigate = useNavigate();
@@ -75,6 +76,10 @@ function Register() {
             Existing User? Log in
           </button>
         </form>
+        <div className="flex items-center mt-6 md:mt-8 cursor-pointer hover:text-[#FF6F00] transition-colors" onClick={()=>navigate("/seller/")}>
+          <StoreIcon className="mr-2" /> 
+           Become a Seller
+        </div>
       </div>
     </div>
   );

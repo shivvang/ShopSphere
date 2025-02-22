@@ -28,7 +28,7 @@ function Login() {
 
     return (
         <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
-          {/* Left Side - Branding Section */}
+       
           <div className="flex flex-col justify-center items-center sm:gap-7  md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
             <h1 className="text-3xl md:text-4xl font-bold text-white">Login</h1>
             <h3 className="text-white text-lg md:text-xl font-medium mt-2">
@@ -37,7 +37,7 @@ function Login() {
             <h2 className="text-6xl font-extrabold text-black">Shop Sphere</h2>
           </div>
     
-          {/* Right Side - Form Section */}
+         
           <div className="flex flex-col justify-center items-center w-full md:w-1/2 h-2/3 md:h-full p-6">
             <form className="flex flex-col gap-6 w-full max-w-md bg-white shadow-lg rounded-lg p-6 md:p-8 border"  onSubmit={handleSubmit}>
               <input 
