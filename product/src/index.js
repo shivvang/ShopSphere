@@ -7,6 +7,7 @@ import log from "./utils/logHandler.js";
 import connectDb from "./database/connect.js";
 import errorHandler from "./utils/errorHandler.js";
 import productRouter from "./routes/product.router.js";
+import SellerRouter from "./routes/Seller.router.js";
 
 connectDb();
 
@@ -26,6 +27,7 @@ app.use(cookieparser());
 app.use(errorHandler);
 
 app.use("/api/products",productRouter);
+app.use("/api/seller",SellerRouter);
 
 
 

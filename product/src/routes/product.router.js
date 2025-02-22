@@ -3,14 +3,17 @@ import { createProduct,deleteProduct,uploadFileAndGetUrl,searchProducts, updateP
 import authenticatedRequest from "../middleware/authMiddleware.js";
 const productRouter = express.Router();
 
-productRouter.use(authenticatedRequest);
+
 
 import multer from "multer";
 const upload = multer({storage: multer.memoryStorage()});
 //files stored in memoryStorage() remain in memory until the request is completed
 
+
+
+// Product Management (Seller-Specific)
 productRouter.post("/createProduct",createProduct);
-productRouter.post("/searchProducts",searchProducts);
+productRouter.post("/searchProducts",authenticatedRequest,searchProducts);
 productRouter.post("/file/upload",upload.single("file"),uploadFileAndGetUrl);
 productRouter.put("/updateProduct/:productId", updateProduct);
 productRouter.delete("/deleteProduct/:productId",deleteProduct);
