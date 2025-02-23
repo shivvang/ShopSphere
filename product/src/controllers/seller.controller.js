@@ -1,15 +1,16 @@
 import { ApiError } from "../utils/ApiError.js";
 import Seller from "../database/models/Seller.model.js";
 import log from "../utils/logHandler.js";
-import { validateNewPassWord, validateSeller } from "../validators/sellerValidator.js";
+import { validateLogin, validateNewPassWord, validateSeller } from "../validators/sellerValidator.js";
 
-export const registerSeller = async()=>{
+export const registerSeller = async(req,res,next)=>{
 
 log.info("Register Seller EndPoint....");
 
     try {
 
         const { error } = validateSeller(req.body);
+
         if (error) {
             log.error("Validation error while registering Seller:", error.details);
             return res.status(400).json({
@@ -19,6 +20,8 @@ log.info("Register Seller EndPoint....");
         }    
 
     const { phone, email, password,shopName} = req.body;
+
+    
 
     const existingSeller = await Seller.findOne({$or:[{phone},{email}]});
 
@@ -57,7 +60,7 @@ log.info("Register Seller EndPoint....");
 
 };
 
-export const loginSeller = async()=>{
+export const loginSeller = async(req,res,next)=>{
 log.info("Login customer endpoint hit...");
     try {
         const {error} = validateLogin(req.body);
@@ -82,7 +85,7 @@ log.info("Login customer endpoint hit...");
             })
         }
 
-        const isPasswordCorrect = await Seller.comparePassword(password);
+        const isPasswordCorrect = await exisitingSeller.comparePassword(password);
 
         if(!isPasswordCorrect){
             log.warn("Wrong password entered by user",{email});
@@ -120,7 +123,7 @@ log.info("Login customer endpoint hit...");
     }
 };
 
-export const refreshToken = async()=>{
+export const refreshToken = async(req,res,next)=>{
     log.info("Reset token API endpoint hit...");
     try {
 
@@ -163,7 +166,7 @@ export const refreshToken = async()=>{
     }
 };
 
-export const logoutSeller = async()=>{
+export const logoutSeller = async(req,res,next)=>{
     log.info("Logout endpoint hit");
 
     try {
@@ -198,7 +201,7 @@ export const logoutSeller = async()=>{
     }
 };
 
-export const resetPassword = async()=>{
+export const resetPassword = async(req,res,next)=>{
     log.info("Reset Password API endpoint hit...");
 
     try {

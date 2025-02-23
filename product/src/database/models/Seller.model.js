@@ -10,7 +10,7 @@ const sellerSchema = new mongoose.Schema({
     products:[{type:mongoose.Schema.Types.ObjectId,ref:"Product"}]
 },{timestamps:true})
 
-const Seller = mongoose.model("Seller",sellerSchema);
+
 
 sellerSchema.pre("save",async function(next){
     if(!this.isModified("password")) next();
@@ -26,13 +26,15 @@ sellerSchema.methods.comparePassword = async function(password){
 
 sellerSchema.methods.generateAccessToken =  function(){
    jwt.sign({sellerId:this._id},process.env.SELLER_ACCESS_TOKEN_SECRET,{
-    expiresIn:SELLER_ACCESS_TOKEN_EXPIRY
+    expiresIn:process.env.SELLER_ACCESS_TOKEN_EXPIRY
    })
 }
 
 sellerSchema.methods.generateRefreshToken = function (){
-    jwt.sign({sellerId:this._id},process.env.SELLER_REFRESH_TOKEN_SECRET,{expiresIn:SELLER_REFRESH_TOKEN_EXPIRY})
+    jwt.sign({sellerId:this._id},process.env.SELLER_REFRESH_TOKEN_SECRET,{expiresIn:process.env.SELLER_REFRESH_TOKEN_EXPIRY})
 }
+
+const Seller = mongoose.model("Seller",sellerSchema);
 
 export default Seller;
 
