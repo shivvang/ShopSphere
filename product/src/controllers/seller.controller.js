@@ -283,3 +283,37 @@ export const deleteSeller = async (req, res, next) => {
         return next(new ApiError("Internal Server Error", 500));
     }
 };
+
+export const associateProductWithSeller = async(req,res,next)=>{
+    log.info("associateProduct end point is hit....")
+    try {
+        const { productId } = req.params;
+        const sellerId = req.sellerId;
+
+        if (!productId || !sellerId) {
+            return next(new ApiError("Missing required parameters: sellerId or productId", 400));
+        }
+
+        const seller = await Seller.findById(sellerId);
+        if (!seller) {
+            return next(new ApiError("Seller not found", 404));
+        }
+
+     
+        if (seller.products.includes(productId)) {
+            return next(new ApiError("Product is already associated with this seller", 400));
+        }
+
+      
+        seller.products.push(productId);
+        await seller.save();
+
+        log.info(`Product ${productId} successfully associated with seller ${sellerId}`);
+        return res.status(200).json({ message: "Product associated successfully", seller });
+
+
+    } catch (error) {
+        log.error("Error occurred while associating product with seller:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+}

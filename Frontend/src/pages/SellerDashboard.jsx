@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createProduct, removeImageFromAWS, uploadFileAndGetUrl } from "../services/useProduct";
 // import { uploadFileAndGetUrl, removeImageFromAWS } from "../services/imageService";
 // import { getSellerProducts, createProduct, updateProduct, deleteProduct } from "../services/productService";
 
@@ -7,7 +8,6 @@ function SellerDashboard() {
     name: "",
     description: "",
     imageUrl: "",
-    stock: "",
     price: "",
     discount: "",
     category: "",
@@ -54,16 +54,15 @@ function SellerDashboard() {
       await createProduct(formData);
     }
     setFormData({
-      name: "",
-      description: "",
-      imageUrl: "",
-      stock: "",
-      price: "",
-      discount: "",
-      category: "",
-      brand: "",
-      tags: "",
-      searchKeywords: "",
+     name: "",
+     description: "",
+     imageUrl: "",
+     price: "",
+     discount: "",
+     category: "",
+     brand: "",
+     tags: "",
+     searchKeywords:"",
     });
     setEditingProduct(null);
     fetchProducts();
@@ -74,6 +73,10 @@ function SellerDashboard() {
     fetchProducts();
   };
 
+  
+
+  console.log("seach filters",formData);
+
   return (
     <div className="p-6 bg-white min-h-screen text-black">
       <h1 className="text-3xl font-bold text-[#FF6F00] mb-4">Manage Products</h1>
@@ -82,11 +85,11 @@ function SellerDashboard() {
         <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Product Name" className="border border-[#FF6F00] p-2 w-full mb-2" required />
         <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" className="border border-[#FF6F00] p-2 w-full mb-2" required />
         <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price" className="border border-[#FF6F00] p-2 w-full mb-2" required />
-        <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" className="border border-[#FF6F00] p-2 w-full mb-2" required />
+        <input type="number" name="discount" value={formData.discount} onChange={handleChange} placeholder="discount" className="border border-[#FF6F00] p-2 w-full mb-2" required />
         <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="Category" className="border border-[#FF6F00] p-2 w-full mb-2" required />
         <input type="text" name="brand" value={formData.brand} onChange={handleChange} placeholder="Brand" className="border border-[#FF6F00] p-2 w-full mb-2" required />
-        <input type="text" name="tags" value={formData.tags} onChange={handleChange} placeholder="Tags (comma-separated)" className="border border-[#FF6F00] p-2 w-full mb-2" />
-        <input type="text" name="searchKeywords" value={formData.searchKeywords} onChange={handleChange} placeholder="Search Keywords" className="border border-[#FF6F00] p-2 w-full mb-2" />
+        <input type="text" name="tags" value={formData.tags} onChange={(e)=>setFormData((prev)=>({...prev,tags:e.target.value}))} placeholder="Tags (comma-separated)" className="border border-[#FF6F00] p-2 w-full mb-2" />
+        <input type="text" name="searchKeywords" value={formData.searchKeywords} onChange={handleChange} placeholder="Search Keywords (comma-separated)" className="border border-[#FF6F00] p-2 w-full mb-2" />
         <input type="file" onChange={handleImageUpload} className="p-2 w-full bg-white text-black mb-2 border border-[#FF6F00]" accept="image/*" />
         {formData.imageUrl && (
           <div className="flex items-center gap-4">

@@ -32,7 +32,6 @@ export const createProduct = async (req, res, next) => {
       name,
       description,
       imageUrl,
-      stock,
       price,
       discount,
       category,
@@ -246,6 +245,7 @@ export const uploadFileAndGetUrl = async (req, res) => {
     log.info(` download URL: ${fileUrl}`);
 
     return res.status(200).json({
+      success:true,
       message: "File uploaded successfully",
       fileUrl,
     });

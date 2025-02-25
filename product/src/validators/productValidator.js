@@ -18,11 +18,6 @@ export const validateAddProduct = (data) => {
       "string.uri": "Image URL should be a valid URL.",
       "any.required": "Image URL is required."
     }),
-    stock: Joi.number().integer().min(0).required().messages({
-      "number.base": "Stock should be a number.",
-      "number.min": "Stock cannot be negative.",
-      "any.required": "Stock is required."
-    }),
     price: Joi.number().min(0).required().messages({
       "number.base": "Price should be a number.",
       "number.min": "Price cannot be negative.",
@@ -134,10 +129,6 @@ export const validateUpdateProduct = (data) => {
     }),
     imageUrl: Joi.string().uri().optional().messages({
       "string.uri": "Image URL must be a valid URL.",
-    }),
-    stock: Joi.number().integer().min(0).optional().messages({
-      "number.base": "Stock must be a number.",
-      "number.min": "Stock cannot be negative.",
     }),
     price: Joi.number().min(0).optional().messages({
       "number.base": "Price must be a positive number.",
