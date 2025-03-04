@@ -19,7 +19,7 @@ function SellerLogin() {
       const result = await login({...formData,setFormData});
 
       if (result.success) {
-        navigate("/store");
+        navigate("/seller/dashboard");
       } else {
         setError(result.error);
       }

@@ -5,6 +5,7 @@ import log from "../utils/logHandler.js";
 import { deleteUploadedFile, getSignedUploadUrl } from "../S3/s3Service.js";
 import axios from "axios";
 import path from "path";
+import { publishEventToExchange } from "../Queue/rabbitmq.js";
 
 
 // **Create a new product**
@@ -183,16 +184,17 @@ export const updateProduct = async (req, res, next) => {
       return next(new ApiError(404, "Product not found."));
     }
 
-    // Update product fields
-    const { description, imageUrl, price, discount, tags } = req.body;
+    
+    const { description, imageUrl, price, discount, tags, searchKeywords } = req.body;
 
-    if (description) product.description = description;
-    if (imageUrl) product.imageUrl = imageUrl;
-    if (price !== undefined) product.price = price;
-    if (discount !== undefined) product.discount = discount;
-    if (tags) product.tags = tags;
+    if (description) product.set({ description });
+    if (imageUrl) product.set({ imageUrl });
+    if (price !== undefined) product.set({ price });
+    if (discount !== undefined) product.set({ discount });
+    if (tags) product.set({ tags });
+    if (searchKeywords) product.set({ searchKeywords });
 
-    const updatePayload = { productId }; 
+    const updatePayload = { productId };
 
     if (imageUrl) updatePayload.imageUrl = imageUrl;
     if (price !== undefined) updatePayload.price = price;

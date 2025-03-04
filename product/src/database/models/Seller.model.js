@@ -24,15 +24,23 @@ sellerSchema.methods.comparePassword = async function(password){
 }
 
 
-sellerSchema.methods.generateAccessToken =  function(){
-   jwt.sign({sellerId:this._id},process.env.SELLER_ACCESS_TOKEN_SECRET,{
-    expiresIn:process.env.SELLER_ACCESS_TOKEN_EXPIRY
-   })
-}
-
-sellerSchema.methods.generateRefreshToken = function (){
-    jwt.sign({sellerId:this._id},process.env.SELLER_REFRESH_TOKEN_SECRET,{expiresIn:process.env.SELLER_REFRESH_TOKEN_EXPIRY})
-}
+sellerSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+      { sellerId: this._id },
+      process.env.SELLER_ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: process.env.SELLER_ACCESS_TOKEN_EXPIRY,
+      }
+    );
+  };
+  
+  sellerSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+      { sellerId: this._id },
+      process.env.SELLER_REFRESH_TOKEN_SECRET,
+      { expiresIn: process.env.SELLER_REFRESH_TOKEN_EXPIRY }
+    );
+  };
 
 const Seller = mongoose.model("Seller",sellerSchema);
 

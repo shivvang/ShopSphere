@@ -55,3 +55,25 @@ export const login = async({email,password,setFormData})=>{
     return {error: error.response.data?.message || "Something went wrong, try again."};
   }
 }
+
+
+  export const getSellerProducts = async()=>{
+    try {
+      const response = await axios.post(`${sellerRoute}/my-products`,{},{
+        withCredentials: true,
+      });
+
+      if (!response.data.success) {
+        return { error: response.data.message || "fetching products failed." };
+      }
+
+      return {
+        success: true,
+        message: "Successfully fetched Products.",
+        products: response.data.products,
+      };
+
+    } catch (error) {
+      return {error: error.response.data?.message || "Something went wrong, try again."};
+    }
+  }

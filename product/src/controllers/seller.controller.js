@@ -75,9 +75,9 @@ log.info("Login customer endpoint hit...");
 
         const {email,password} = req.body;
 
-        const exisitingSeller = await Seller.findOne({email});
+        const existingSeller = await Seller.findOne({email});
 
-        if(!exisitingSeller) {
+        if(!existingSeller) {
             log.warn("Seller with given email doesnt not exist",{email});
             return res.status(400).json({
                 success:false,
@@ -85,15 +85,15 @@ log.info("Login customer endpoint hit...");
             })
         }
 
-        const isPasswordCorrect = await exisitingSeller.comparePassword(password);
+        const isPasswordCorrect = await existingSeller.comparePassword(password);
 
         if(!isPasswordCorrect){
             log.warn("Wrong password entered by user",{email});
             return next(new ApiError(403,"unauthorized",null));
         }
 
-        const accessToken = await exisitingSeller.generateAccessToken();
-        const refreshToken = await exisitingSeller.generateRefreshToken();
+       const accessToken = existingSeller.generateAccessToken();
+       const refreshToken = existingSeller.generateRefreshToken();
 
         log.info("User logged in successfully", { email });
 
@@ -111,9 +111,9 @@ log.info("Login customer endpoint hit...");
                 success: true,
                 message: "Seller logged in successfully",
                 user: {
-                    id: exisitingSeller._id,
-                    email: exisitingSeller.email,
-                    phone: exisitingSeller.phone,
+                    id: existingSeller._id,
+                    email: existingSeller.email,
+                    phone: existingSeller.phone,
                 },
             });
 
@@ -317,3 +317,63 @@ export const associateProductWithSeller = async(req,res,next)=>{
         return next(new ApiError("Internal Server Error", 500));
     }
 }
+
+export const disassociateProductFromSeller = async (req, res, next) => {
+    log.info("dis associateProduct end point is hit....");
+    try {
+      const { productId } = req.params;
+      const sellerId = req.sellerId;
+  
+      if (!productId || !sellerId) {
+        return next(new ApiError("Missing required parameters: sellerId or productId", 400));
+      }
+  
+      const seller = await Seller.findById(sellerId);
+      if (!seller) {
+        return next(new ApiError("Seller not found", 404));
+      }
+  
+      if (!seller.products.includes(productId)) {
+        return next(new ApiError("Product is already dis associated with this seller", 400));
+      }
+  
+    
+      seller.products = seller.products.filter((id) => id.toString() !== productId);
+  
+      await seller.save();
+  
+      log.info(`Product ${productId} successfully disassociated from seller ${sellerId}`);
+      return res.status(200).json({ message: "Product disassociated successfully", seller });
+    } catch (error) {
+      log.error("Error occurred while dis associating product with seller:", error);
+      return next(new ApiError("Internal Server Error", 500));
+    }
+  };
+
+export const getSellerProducts = async (req, res, next) => {
+    log.info("Fetching all products for the seller...");
+
+    try {
+        const sellerId = req.sellerId;
+
+        if (!sellerId) {
+            return next(new ApiError("Seller ID is required", 400));
+        }
+
+        const seller = await Seller.findById(sellerId).populate("products");
+
+        if (!seller) {
+            return next(new ApiError("Seller not found", 404));
+        }
+
+        if (!seller.products.length) {
+            return res.status(200).json({ success:true, message: "No products found for this seller", products: [] });
+        }
+
+        return res.status(200).json({ success:true,message: "Products fetched successfully", products: seller.products });
+
+    } catch (error) {
+        log.error("Error fetching seller's products:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+};

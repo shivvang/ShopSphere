@@ -119,44 +119,38 @@ export const validateSearchFilters = (data) => {
 
 export const validateUpdateProduct = (data) => {
   const Schema = Joi.object({
-    name: Joi.string().trim().optional().messages({
-      "string.base": "Name should be a string.",
-      "string.empty": "Name cannot be empty.",
+    description: Joi.string().trim().allow('').optional().messages({
+      'string.base': 'Description should be a string.',
     }),
-    description: Joi.string().trim().optional().messages({
-      "string.base": "Description should be a string.",
-      "string.empty": "Description cannot be empty.",
+    imageUrl: Joi.string().uri().allow('').optional().messages({
+      'string.uri': 'Image URL must be a valid URL.',
     }),
-    imageUrl: Joi.string().uri().optional().messages({
-      "string.uri": "Image URL must be a valid URL.",
+    price: Joi.number().min(0).allow('').optional().messages({
+      'number.base': 'Price must be a positive number.',
+      'number.min': 'Price cannot be negative.',
     }),
-    price: Joi.number().min(0).optional().messages({
-      "number.base": "Price must be a positive number.",
-      "number.min": "Price cannot be negative.",
+    discount: Joi.number().min(0).max(100).allow('').optional().messages({
+      'number.base': 'Discount must be a number.',
+      'number.min': 'Discount cannot be negative.',
+      'number.max': 'Discount cannot be greater than 100.',
     }),
-    discount: Joi.number().min(0).max(100).optional().default(0).messages({
-      "number.base": "Discount must be a number.",
-      "number.min": "Discount cannot be negative.",
-      "number.max": "Discount cannot be greater than 100.",
+    tags: Joi.array().items(Joi.string().trim().lowercase().allow('')).allow('').optional().messages({
+      'array.base': 'Tags should be an array of strings.',
     }),
-    category: Joi.string().trim().optional().messages({
-      "string.base": "Category must be a string.",
+    searchKeywords: Joi.array().items(Joi.string().trim().lowercase().allow('')).allow('').optional().messages({
+      'array.base': 'Search keywords should be an array of strings.',
     }),
-    brand: Joi.string().trim().optional().messages({
-      "string.base": "Brand must be a string.",
+    name: Joi.string().trim().allow('').optional().messages({
+      'string.base': 'Name should be a string.',
     }),
-    ratings: Joi.number().min(0).max(5).optional().messages({
-      "number.base": "Ratings must be a number between 0 and 5.",
-      "number.min": "Ratings cannot be less than 0.",
-      "number.max": "Ratings cannot be more than 5.",
+    category: Joi.string().trim().allow('').optional().messages({
+      'string.base': 'Category should be a string.',
     }),
-    tags: Joi.array().items(Joi.string().trim().lowercase()).optional().messages({
-      "array.base": "Tags should be an array of strings.",
+    brand: Joi.string().trim().allow('').optional().messages({
+      'string.base': 'Brand should be a string.',
     }),
-    searchKeywords: Joi.array().items(Joi.string().trim().lowercase()).optional().messages({
-      "array.base": "Search keywords should be an array of strings.",
-    })
-  });
+  })
+  .or('description', 'imageUrl', 'price', 'discount', 'tags', 'searchKeywords'); 
 
   return Schema.validate(data);
 };

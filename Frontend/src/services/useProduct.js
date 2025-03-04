@@ -70,15 +70,91 @@ export const createProduct = async({ name,description,imageUrl,price,discount,ca
             return value.trim();
         });
 
-        console.log("switching position",tagsArray,searchKeywordsArray);
-
-        imageUrl ="https://example.com/headphones.jpg";
-
         const response = await axios.post(`http://localhost:8002/api/products/createProduct`,{name,description,imageUrl,price,discount,category,brand,tags:tagsArray,searchKeywords:searchKeywordsArray});
+
         if (!response.data.success) return { error: response.data.message || "Registration failed." };
-        return { success: true, message: "Successfully Created Product.",product: response.data.product };
+
+    
+        const associateProductwithSeller = await axios.post(
+            `http://localhost:8002/api/seller/associateProduct/${response.data.product._id}`,{},{
+            withCredentials: true,
+            }
+          );
+
+        return { success: true, message: "Successfully Created Product and Associated with Seller.",product: response.data.product ,seller:associateProductwithSeller.data.seller._id};
 
     } catch (error) {
         return { error: error.response?.data?.message || "Something went wrong, try again." };
     }
+}
+
+export const updateProduct = async(productId,formData)=>{
+    try {
+
+        const updateData = {}; // Object to hold only updated fields
+
+        if (formData.description !== "") {
+          updateData.description = formData.description;
+        }
+        if (formData.imageUrl !== "") {
+          updateData.imageUrl = formData.imageUrl;
+        }
+        if (formData.price !== "") {
+          updateData.price = formData.price;
+        }
+        if (formData.discount !== "") {
+          updateData.discount = formData.discount;
+        }
+        
+        const tagsArray = formData.tags.split(",").map((value) => value.trim());
+        if (tagsArray.length > 0 && !(tagsArray.length === 1 && tagsArray[0] === "")) { 
+            updateData.tags = tagsArray;
+            }
+    
+            
+        const keywordsArray = formData.searchKeywords.split(",").map((value) => value.trim());
+        if (keywordsArray.length > 0 && !(keywordsArray.length === 1 && keywordsArray[0] === "")) { 
+        updateData.searchKeywords = keywordsArray;
+        }
+              
+        const response = await axios.put(`http://localhost:8002/api/products/updateProduct/${productId}`,updateData,{withCredentials:true});
+
+        return { success: true, message: "Successfully Created Product and Associated with Seller.",product: response.data.product};
+
+    } catch (error) {
+        return { error: error.response?.data?.message || "Something went wrong, try again." };
+    }
+}
+
+export const deleteProduct = async(productId)=>{
+    try {
+        if (!productId) {
+          console.error("Product ID is required.");
+          return { error: "Product ID is required." };
+        }
+    
+        // Delete the product
+        const productDeleteResponse = await axios.delete(
+          `http://localhost:8002/api/products/${productId}`, 
+          { withCredentials: true }
+        );
+    
+        // Disassociate the product from sellers
+        const disassociateResponse = await axios.delete(
+          `http://localhost:8002/api/seller/disassociateProduct/${productId}`,
+          { withCredentials: true }
+        );
+    
+        return {
+          success: true,
+          message: "Product deleted and disassociated successfully.",
+          productDeleteResponse: productDeleteResponse.data,
+          disassociateResponse: disassociateResponse.data,
+        };
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        return {
+          error: error.response?.data?.message || "Something went wrong, try again.",
+        };
+      }
 }
