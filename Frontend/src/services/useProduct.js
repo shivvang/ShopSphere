@@ -135,7 +135,7 @@ export const deleteProduct = async(productId)=>{
     
         // Delete the product
         const productDeleteResponse = await axios.delete(
-          `http://localhost:8002/api/products/${productId}`, 
+          `http://localhost:8002/api/products/deleteProduct/${productId}`, 
           { withCredentials: true }
         );
     
