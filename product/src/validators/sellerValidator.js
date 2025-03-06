@@ -66,15 +66,6 @@ export const validateLogin = (data)=>{
 
 export const validateNewPassWord = (data)=>{
     const schema = Joi.object({
-        email: Joi.string()
-            .email()
-            .required()
-            .messages({
-                "string.base": `"email" should be a type of text`,
-                "string.empty": `"email" cannot be empty`,
-                "string.email": `"email" must be a valid email format`,
-                "any.required": `"email" is a required field`
-            }),
         oldPassword: Joi.string()
             .min(6)
             .required()

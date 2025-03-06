@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createProduct, deleteProduct, removeImageFromAWS, updateProduct, uploadFileAndGetUrl } from "../services/useProduct";
 import { getSellerProducts } from "../services/useSeller";
-
+import {Link}  from "react-router-dom"
 
 function SellerDashboard() {
   const [formData, setFormData] = useState({
@@ -87,7 +87,7 @@ function SellerDashboard() {
   return (
     <div className="p-6 bg-white min-h-screen text-black">
       <h1 className="text-3xl font-bold text-[#FF6F00] mb-4">Manage Products</h1>
-
+      <Link to="/seller/settings" className="fixed bottom-4 right-4 bg-[#FF6F00] text-white p-3 rounded-full shadow-lg hover:bg-[#e65c00] transition">⚙️</Link>
       <form className="bg-white shadow-lg p-6 rounded-md border border-[#FF6F00]" onSubmit={handleSubmit}>
         <input type="text" name="name" value={formData.name } onChange={handleChange} disabled={editingProduct} placeholder="Product Name" className="border border-[#FF6F00] p-2 w-full mb-2"  />
         <textarea name="description" value={formData.description } onChange={handleChange} placeholder="Description" className="border border-[#FF6F00] p-2 w-full mb-2"  />

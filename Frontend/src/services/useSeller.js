@@ -57,7 +57,7 @@ export const login = async({email,password,setFormData})=>{
 }
 
 
-  export const getSellerProducts = async()=>{
+export const getSellerProducts = async()=>{
     try {
       const response = await axios.post(`${sellerRoute}/my-products`,{},{
         withCredentials: true,
@@ -76,4 +76,48 @@ export const login = async({email,password,setFormData})=>{
     } catch (error) {
       return {error: error.response.data?.message || "Something went wrong, try again."};
     }
+}
+
+export const logout = async()=>{
+  try {
+    const response = await axios.post(`${sellerRoute}/logout`,{},{
+      withCredentials: true,
+    });
+
+    if (!response.data.success) return { error: response.data.message || "logout failed." };
+
+    return { success: true, message: "Successfully logged out." };
+  } catch (error) {
+    return {error: error.response.data?.message || "Something went wrong, try again."};
   }
+}
+
+export const resetPassword = async(oldPassword,newPassword)=>{
+  try {
+    const response = await axios.post(`${sellerRoute}/reset-password`,{oldPassword,newPassword},{
+      withCredentials: true,
+    });
+
+    if (!response.data.success) return { error: response.data.message || "reset password failed." };
+
+    return { success: true, message: "Successfully reset." };
+
+  } catch (error) {
+    return {error: error.response.data?.message || "Something went wrong, try again."};
+  }
+}
+
+export const deleteSeller = async()=>{
+  try {
+    const response = await axios.delete(`${sellerRoute}/delete`,{
+      withCredentials: true,
+    });
+
+    if (!response.data.success) return { error: response.data.message || "reset password failed." };
+
+    return { success: true, message: "Successfully reset." };
+
+  } catch (error) {
+    return {error: error.response.data?.message || "Something went wrong, try again."};
+  }
+}

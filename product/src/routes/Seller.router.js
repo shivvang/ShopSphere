@@ -8,7 +8,7 @@ const SellerRouter = express.Router();
 SellerRouter.post("/register",registerSeller);
 SellerRouter.post("/login",loginSeller);
 SellerRouter.post("/token",verifyRefreshTokenMiddleware, refreshToken);
-SellerRouter.post("/logout",verifyRefreshTokenMiddleware, logoutSeller);
+SellerRouter.post("/logout", logoutSeller);
 SellerRouter.post("/associateProduct/:productId",verifyRefreshTokenMiddleware,associateProductWithSeller)
 SellerRouter.delete("/disassociateProduct/:productId",verifyRefreshTokenMiddleware,disassociateProductFromSeller)
 SellerRouter.post("/reset-password",verifyRefreshTokenMiddleware, resetPassword);

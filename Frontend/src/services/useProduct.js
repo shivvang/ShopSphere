@@ -33,7 +33,7 @@ export const uploadFileAndGetUrl = async(file)=>{
 
         formData.append('file', file);
 
-       const response = await axios.post(`http://localhost:8002/api/products/file/upload`,formData,{headers: {
+       const response = await axios.post(`${productRoute}/file/upload`,formData,{headers: {
           'Content-Type': 'multipart/form-data', 
         },}); 
 
@@ -48,7 +48,7 @@ export const uploadFileAndGetUrl = async(file)=>{
 
 export const removeImageFromAWS = async(imageUrl)=>{
     try {
-        const response = await axios.delete(`http://localhost:8002/api/products/image/remove`,{
+        const response = await axios.delete(`${productRoute}/image/remove`,{
             data: { imageUrl: imageUrl }, 
           });
 
@@ -70,7 +70,7 @@ export const createProduct = async({ name,description,imageUrl,price,discount,ca
             return value.trim();
         });
 
-        const response = await axios.post(`http://localhost:8002/api/products/createProduct`,{name,description,imageUrl,price,discount,category,brand,tags:tagsArray,searchKeywords:searchKeywordsArray});
+        const response = await axios.post(`${productRoute}/createProduct`,{name,description,imageUrl,price,discount,category,brand,tags:tagsArray,searchKeywords:searchKeywordsArray});
 
         if (!response.data.success) return { error: response.data.message || "Registration failed." };
 
@@ -117,7 +117,7 @@ export const updateProduct = async(productId,formData)=>{
         updateData.searchKeywords = keywordsArray;
         }
               
-        const response = await axios.put(`http://localhost:8002/api/products/updateProduct/${productId}`,updateData,{withCredentials:true});
+        const response = await axios.put(`${productRoute}/updateProduct/${productId}`,updateData,{withCredentials:true});
 
         return { success: true, message: "Successfully Created Product and Associated with Seller.",product: response.data.product};
 
@@ -135,7 +135,7 @@ export const deleteProduct = async(productId)=>{
     
         // Delete the product
         const productDeleteResponse = await axios.delete(
-          `http://localhost:8002/api/products/deleteProduct/${productId}`, 
+          `${productRoute}/deleteProduct/${productId}`, 
           { withCredentials: true }
         );
     
