@@ -34,12 +34,18 @@ const SellerSettings = () => {
        }  
       }
     };
+
+    const handleGoBack = () => {
+      navigate(-1); // Navigates to the previous page in history
+    };
   
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
         <div className="bg-white shadow-lg p-6 rounded-md border border-gray-300 w-full max-w-md">
           <h1 className="text-3xl font-bold text-[#FF6F00] mb-6 text-center">Seller Settings</h1>
-  
+          <button onClick={handleGoBack} className="bg-gray-500 text-white p-2 w-full rounded-md font-bold mb-4 hover:bg-gray-600 transition">
+            Go Back
+          </button>
         
           <button onClick={handleLogout} className="bg-[#FF6F00] text-white p-2 w-full rounded-md font-bold mb-4 hover:bg-[#e65c00] transition">
             Logout

@@ -137,8 +137,8 @@ export const refreshToken = async(req,res,next)=>{
         const  seller = await Seller.findById(sellerId);
 
         
-        if (!user) {
-            log.warn(`No Seller found with ID: ${userId}`);
+        if (!seller) {
+            log.warn(`No Seller found with ID: ${sellerId}`);
             return next(new ApiError(404, "Seller not found"));
         }
 

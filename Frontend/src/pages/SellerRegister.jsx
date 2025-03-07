@@ -15,8 +15,8 @@ function SellerRegister() {
       const [error, setError] = useState("");
 
       const handleSubmit = async(e)=>{
-        console.log("the fuck is wrong here");
         e.preventDefault();
+    
         const result = await register({...formData,setFormData});
 
         if (result.success) {

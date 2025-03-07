@@ -13,7 +13,6 @@ export const register = async ({ phone, email, password,shopName, setFormData })
   if (password.length < 6) return { error: "Password must be at least 6 characters long." };
 
   try {
-    console.log("at least im here");
     const response = await axios.post(`${sellerRoute}/register`, {
       phone:phone,
       email,
@@ -49,7 +48,7 @@ export const login = async({email,password,setFormData})=>{
 
     setFormData({ phone: "", email: "", password: "" });
 
-    return { success: true, message: "Successfully registered." };
+    return { success: true, message: "Successfully registered." ,sellerProfile:response.data.user};
 
   } catch (error) {
     return {error: error.response.data?.message || "Something went wrong, try again."};
@@ -116,6 +115,21 @@ export const deleteSeller = async()=>{
     if (!response.data.success) return { error: response.data.message || "reset password failed." };
 
     return { success: true, message: "Successfully reset." };
+
+  } catch (error) {
+    return {error: error.response.data?.message || "Something went wrong, try again."};
+  }
+}
+
+export const refreshAccessToken = async()=>{
+  try {
+    const response = await axios.post(`${sellerRoute}/token`,{}, {
+      withCredentials: true,
+    });
+
+    if (!response.data.success) return { error: response.data.message || "reset password failed." };
+
+    return { success: true, message: "Successfully  Reset." };
 
   } catch (error) {
     return {error: error.response.data?.message || "Something went wrong, try again."};

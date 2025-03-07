@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { createProduct, deleteProduct, removeImageFromAWS, updateProduct, uploadFileAndGetUrl } from "../services/useProduct";
-import { getSellerProducts } from "../services/useSeller";
+import { getSellerProducts, refreshAccessToken } from "../services/useSeller";
 import {Link}  from "react-router-dom"
+import { useSelector } from "react-redux";
+import {useDispatch} from "react-redux";
+import { updateLoginTime } from "../redux/Seller/Features/sellerAuthSliceReducer";
 
 function SellerDashboard() {
   const [formData, setFormData] = useState({
@@ -18,7 +21,8 @@ function SellerDashboard() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState();
   const [editingProduct, setEditingProduct] = useState(null);
-  
+  const dispatch = useDispatch();
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -80,8 +84,35 @@ function SellerDashboard() {
     fetchProducts();
   };
 
-  
+  const {loginTime} = useSelector((state)=>state.seller);
 
+  useEffect(() => {
+    if (!loginTime) return; // If no login time, do nothing
+
+    const expiryTime =  2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    const remainingTime = expiryTime - (Date.now() - loginTime);
+
+    const refreshToken = async () => {
+        const response = await refreshAccessToken();
+        if (response.error) {
+            console.error("Token refresh failed:", response.error);
+        } else {
+            dispatch(updateLoginTime())
+            console.log("Token refreshed successfully.");
+        }
+    };
+
+    if (remainingTime <= 0) {
+        refreshToken(); // Refresh immediately if expired
+    } else {
+      console.log("Setting timeout for refresh in:", remainingTime / 1000, "seconds");
+        const timer = setTimeout(() => {
+            refreshToken(); // Refresh when time is up
+        }, remainingTime);
+
+        return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+}, [loginTime]);
 
 
   return (

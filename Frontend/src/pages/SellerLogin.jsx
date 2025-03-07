@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/useSeller";
+import {useSelector,useDispatch} from "react-redux"
+import { signInFailure, signInRequest, signInSuccess } from "../redux/Seller/Features/sellerAuthSliceReducer";
 
 
 function SellerLogin() {
@@ -8,20 +10,24 @@ function SellerLogin() {
           email:"",
           password:"",
       })
-  
-      const [error, setError] = useState("");
 
+      const { loading, error } = useSelector((state) => state.seller);
+  
       const navigate = useNavigate();
+      const dispatch = useDispatch();
 
     const handleSubmit = async(e)=>{
       e.preventDefault();
 
+      dispatch(signInRequest());
+
       const result = await login({...formData,setFormData});
 
       if (result.success) {
+        dispatch(signInSuccess(result.sellerProfile))
         navigate("/seller/dashboard");
       } else {
-        setError(result.error);
+        dispatch(signInFailure(result.error))
       }
 
     }
