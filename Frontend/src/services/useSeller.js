@@ -127,7 +127,7 @@ export const refreshAccessToken = async()=>{
       withCredentials: true,
     });
 
-    if (!response.data.success) return { error: response.data.message || "reset password failed." };
+    if (!response.data.success) return { error: true };
 
     return { success: true, message: "Successfully  Reset." };
 

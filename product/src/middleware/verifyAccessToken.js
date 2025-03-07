@@ -1,16 +1,19 @@
-import log from "../utils/logHandler.js";
+import jwt from "jsonwebtoken";
+import { ApiError } from "../utils/ApiError.js";
+import log from "../utils/logHandler.js"
 
-const verifyRefreshToken = (req,res,next)=>{
+async function verifyAccessTokenMiddleware(req, res, next) {
+    log.info("Verifying access Token...");
 
     try {
-        const refreshToken = req.cookies.refreshToken;
+        const accessToken = req.cookies.accessToken;
 
-        if (!refreshToken) {
+        if (!accessToken) {
             log.warn("No accessToken provided in cookies.");
             return next(new ApiError(401, "access Token is required"));
         }
 
-        jwt.verify(refreshToken, process.env.SELLER_REFRESH_TOKEN_SECRET, (err, decoded) => {
+        jwt.verify(accessToken, process.env.SELLER_ACCESS_TOKEN_SECRET, (err, decoded) => {
             if (err) {
                 log.error("Invalid or expired access Token", err);
                 return next(new ApiError(403, "Invalid or expired access Token"));
@@ -26,4 +29,4 @@ const verifyRefreshToken = (req,res,next)=>{
     }
 }
 
-export default verifyRefreshToken;
+export default verifyAccessTokenMiddleware;

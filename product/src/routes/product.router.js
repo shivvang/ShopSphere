@@ -1,6 +1,5 @@
 import express from "express";
 import { createProduct,deleteProduct,uploadFileAndGetUrl,searchProducts, updateProduct, removeImageFromAWS } from "../controllers/product.controller.js";
-import authenticatedRequest from "../middleware/authMiddleware.js";
 const productRouter = express.Router();
 
 
@@ -13,7 +12,7 @@ const upload = multer({storage: multer.memoryStorage()});
 
 // Product Management (Seller-Specific)
 productRouter.post("/createProduct",createProduct);
-productRouter.post("/searchProducts",authenticatedRequest,searchProducts);
+productRouter.post("/searchProducts",searchProducts);
 productRouter.post("/file/upload",upload.single("file"),uploadFileAndGetUrl);
 productRouter.put("/updateProduct/:productId", updateProduct);
 productRouter.delete("/deleteProduct/:productId",deleteProduct);

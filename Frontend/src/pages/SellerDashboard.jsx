@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { createProduct, deleteProduct, removeImageFromAWS, updateProduct, uploadFileAndGetUrl } from "../services/useProduct";
 import { getSellerProducts, refreshAccessToken } from "../services/useSeller";
-import {Link}  from "react-router-dom"
-import { useSelector } from "react-redux";
-import {useDispatch} from "react-redux";
-import { updateLoginTime } from "../redux/Seller/Features/sellerAuthSliceReducer";
+import {Link,useNavigate}  from "react-router-dom"
+import { useSelector,useDispatch } from "react-redux";
+import { signOutSuccess, updateLoginTime } from "../redux/Seller/Features/sellerAuthSliceReducer";
 
 function SellerDashboard() {
   const [formData, setFormData] = useState({
@@ -18,6 +17,7 @@ function SellerDashboard() {
     tags: "",
     searchKeywords: "",
   });
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [error, setError] = useState();
   const [editingProduct, setEditingProduct] = useState(null);
@@ -95,6 +95,8 @@ function SellerDashboard() {
     const refreshToken = async () => {
         const response = await refreshAccessToken();
         if (response.error) {
+            dispatch(signOutSuccess());
+            navigate("/seller/login");
             console.error("Token refresh failed:", response.error);
         } else {
             dispatch(updateLoginTime())
