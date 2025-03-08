@@ -19,7 +19,7 @@ export const createProduct = async (req, res, next) => {
       return next(new ApiError(400, "Invalid product data", error.details));
     }
 
-    const { name, description, imageUrl, stock, price, discount, category, brand, tags, searchKeywords } = req.body;
+    const { name, description, imageUrl,price, discount, category, brand, tags, searchKeywords } = req.body;
 
     // Check if the product already exists
     const existingProduct = await Product.findOne({ name, description, category, brand });

@@ -26,7 +26,14 @@ export const register = async ({ phone, email, password,shopName, setFormData })
 
     return { success: true, message: "Successfully registered." };
   } catch (error) {
-    return { error: error.response?.data?.message || "Something went wrong, try again." };
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 };
 
@@ -51,7 +58,14 @@ export const login = async({email,password,setFormData})=>{
     return { success: true, message: "Successfully registered." ,sellerProfile:response.data.user};
 
   } catch (error) {
-    return {error: error.response.data?.message || "Something went wrong, try again."};
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 }
 
@@ -73,7 +87,14 @@ export const getSellerProducts = async()=>{
       };
 
     } catch (error) {
-      return {error: error.response.data?.message || "Something went wrong, try again."};
+      if (error.response) {
+        if (error.response.status >= 400 && error.response.status < 500) {
+          // Controlled backend errors 
+          return { error: error.response.data.message || "Request failed. Please try again." };
+        }
+      }
+      // Unexpected errors
+      return { error: "Something went wrong. Please try again." };
     }
 }
 
@@ -87,7 +108,14 @@ export const logout = async()=>{
 
     return { success: true, message: "Successfully logged out." };
   } catch (error) {
-    return {error: error.response.data?.message || "Something went wrong, try again."};
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 }
 
@@ -102,7 +130,14 @@ export const resetPassword = async(oldPassword,newPassword)=>{
     return { success: true, message: "Successfully reset." };
 
   } catch (error) {
-    return {error: error.response.data?.message || "Something went wrong, try again."};
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 }
 
@@ -117,7 +152,14 @@ export const deleteSeller = async()=>{
     return { success: true, message: "Successfully reset." };
 
   } catch (error) {
-    return {error: error.response.data?.message || "Something went wrong, try again."};
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 }
 
@@ -132,6 +174,13 @@ export const refreshAccessToken = async()=>{
     return { success: true, message: "Successfully  Reset." };
 
   } catch (error) {
-    return {error: error.response.data?.message || "Something went wrong, try again."};
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 }

@@ -22,7 +22,14 @@ export const searchProducts = async({searchQuery,category,brand,discount,price,r
         return { success: true, message: "Successfully Searched.",products: response.data.products };
 
     } catch (error) {
-        return { error: error.response?.data?.message || "Something went wrong, try again." };
+      if (error.response) {
+        if (error.response.status >= 400 && error.response.status < 500) {
+          // Controlled backend errors 
+          return { error: error.response.data.message || "Request failed. Please try again." };
+        }
+      }
+      // Unexpected errors
+      return { error: "Something went wrong. Please try again." };
     }
 }
 
@@ -35,14 +42,22 @@ export const uploadFileAndGetUrl = async(file)=>{
 
        const response = await axios.post(`${productRoute}/file/upload`,formData,{headers: {
           'Content-Type': 'multipart/form-data', 
-        },}); 
+        },
+        withCredentials:true}); 
 
        if (!response.data.success) return { error: response.data.message || "upload failed." };
 
        return { success: true, message: "Successfully Uploaded File.",fileUrl: response.data.fileUrl };
 
     } catch (error) {
-        return { error: error.response?.data?.message || "Something went wrong, try again." };
+      if (error.response) {
+        if (error.response.status >= 400 && error.response.status < 500) {
+          // Controlled backend errors 
+          return { error: error.response.data.message || "Request failed. Please try again." };
+        }
+      }
+      // Unexpected errors
+      return { error: "Something went wrong. Please try again." };
     }
 }
 
@@ -50,13 +65,21 @@ export const removeImageFromAWS = async(imageUrl)=>{
     try {
         const response = await axios.delete(`${productRoute}/image/remove`,{
             data: { imageUrl: imageUrl }, 
+            withCredentials:true,
           });
 
         if (!response.data.success) return { error: response.data.message || "upload failed." };
 
        return { success: true, message: "Successfully Removed Uploaded File.",fileUrl: response.data.fileUrl };
     } catch (error) {
-        return { error: error.response?.data?.message || "Something went wrong, try again." };
+      if (error.response) {
+        if (error.response.status >= 400 && error.response.status < 500) {
+          // Controlled backend errors 
+          return { error: error.response.data.message || "Request failed. Please try again." };
+        }
+      }
+      // Unexpected errors
+      return { error: "Something went wrong. Please try again." };
     }
 }
 
@@ -84,7 +107,14 @@ export const createProduct = async({ name,description,imageUrl,price,discount,ca
         return { success: true, message: "Successfully Created Product and Associated with Seller.",product: response.data.product ,seller:associateProductwithSeller.data.seller._id};
 
     } catch (error) {
-        return { error: error.response?.data?.message || "Something went wrong, try again." };
+      if (error.response) {
+        if (error.response.status >= 400 && error.response.status < 500) {
+          // Controlled backend errors 
+          return { error: error.response.data.message || "Request failed. Please try again." };
+        }
+      }
+      // Unexpected errors
+      return { error: "Something went wrong. Please try again." };
     }
 }
 
@@ -122,7 +152,14 @@ export const updateProduct = async(productId,formData)=>{
         return { success: true, message: "Successfully Created Product and Associated with Seller.",product: response.data.product};
 
     } catch (error) {
-        return { error: error.response?.data?.message || "Something went wrong, try again." };
+      if (error.response) {
+        if (error.response.status >= 400 && error.response.status < 500) {
+          // Controlled backend errors 
+          return { error: error.response.data.message || "Request failed. Please try again." };
+        }
+      }
+      // Unexpected errors
+      return { error: "Something went wrong. Please try again." };
     }
 }
 
@@ -152,9 +189,13 @@ export const deleteProduct = async(productId)=>{
           disassociateResponse: disassociateResponse.data,
         };
       } catch (error) {
-        console.error("Error deleting product:", error);
-        return {
-          error: error.response?.data?.message || "Something went wrong, try again.",
-        };
+        if (error.response) {
+          if (error.response.status >= 400 && error.response.status < 500) {
+            // Controlled backend errors 
+            return { error: error.response.data.message || "Request failed. Please try again." };
+          }
+        }
+        // Unexpected errors
+        return { error: "Something went wrong. Please try again." };
       }
 }

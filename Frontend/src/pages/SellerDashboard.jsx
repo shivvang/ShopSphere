@@ -4,6 +4,8 @@ import { getSellerProducts, refreshAccessToken } from "../services/useSeller";
 import {Link,useNavigate}  from "react-router-dom"
 import { useSelector,useDispatch } from "react-redux";
 import { signOutSuccess, updateLoginTime } from "../redux/Seller/Features/sellerAuthSliceReducer";
+import Spinner from "../modules/common/Spinner";
+import toast from "react-hot-toast";
 
 function SellerDashboard() {
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ function SellerDashboard() {
   });
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState();
+  const [loading,setLoading] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const dispatch = useDispatch();
 
@@ -28,14 +30,22 @@ function SellerDashboard() {
   }, []);
 
   const fetchProducts = async () => {
-    const data = await getSellerProducts();
+    if (loading) return; // Prevent multiple requests
 
-    if (!data.success) {
-      setError(data.error); 
-      return; 
+    setLoading(true);
+    try {
+      const data = await getSellerProducts();
+      if (data.success) {
+        setProducts(data.products);
+        toast.success("Fetched all products");
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setLoading(false);
     }
-  
-    setProducts(data.products);
   };
 
   const handleChange = (e) => {
@@ -53,35 +63,87 @@ function SellerDashboard() {
   };
 
   const handleDeleteImage = async () => {
-    await removeImageFromAWS(formData.imageUrl);
-    setFormData({ ...formData, imageUrl: "" });
+    if (!formData.imageUrl || loading) return;
+    setLoading(true);
+    try {
+      const response = await removeImageFromAWS(formData.imageUrl);
+      if (response.success) {
+        setFormData((prev) => ({ ...prev, imageUrl: "" }));
+        toast.success("Image removed");
+      } else {
+        toast.error(response.error);
+      }
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setLoading(false);
+    }
+    
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingProduct) {
-      await updateProduct(editingProduct.id, formData);
-    } else {
-      await createProduct(formData);
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      let response;
+      if (editingProduct) {
+        response = await updateProduct(editingProduct.id, formData);
+        if (response.success) {
+          toast.success("Product updated successfully");
+        } else {
+          toast.error(response.error);
+        }
+      } else {
+        response = await createProduct(formData);
+        if (response.success) {
+          toast.success("Product created successfully");
+        } else {
+          toast.error(response.error);
+        }
+      }
+      resetForm();
+      fetchProducts();
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setLoading(false);
     }
-    setFormData({
-     name: "",
-     description: "",
-     imageUrl: "",
-     price: "",
-     discount: "",
-     category: "",
-     brand: "",
-     tags: "",
-     searchKeywords:"",
-    });
-    setEditingProduct(null);
-    fetchProducts();
   };
 
   const handleDeleteProduct = async (productId) => {
-    await deleteProduct(productId);
-    fetchProducts();
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      const response = await deleteProduct(productId);
+      if (response.success) {
+        toast.success("Product deleted");
+        fetchProducts(); // Refresh products after deletion
+      } else {
+        toast.error(response.error);
+      }
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      description: "",
+      imageUrl: "",
+      price: "",
+      discount: "",
+      category: "",
+      brand: "",
+      tags: "",
+      searchKeywords: "",
+    });
+    setEditingProduct(null);
   };
 
   const {loginTime} = useSelector((state)=>state.seller);
@@ -93,14 +155,17 @@ function SellerDashboard() {
     const remainingTime = expiryTime - (Date.now() - loginTime);
 
     const refreshToken = async () => {
+        setLoading(true);
         const response = await refreshAccessToken();
+        setLoading(false);
+        
         if (response.error) {
             dispatch(signOutSuccess());
             navigate("/seller/login");
-            console.error("Token refresh failed:", response.error);
+            toast.error("Session expired. Please log in again.");
         } else {
             dispatch(updateLoginTime())
-            console.log("Token refreshed successfully.");
+            toast.success("Session refreshed.");
         }
     };
 
@@ -116,8 +181,10 @@ function SellerDashboard() {
     }
 }, [loginTime]);
 
-
+ 
   return (
+    <>
+     {loading && <Spinner/>}
     <div className="p-6 bg-white min-h-screen text-black">
       <h1 className="text-3xl font-bold text-[#FF6F00] mb-4">Manage Products</h1>
       <Link to="/seller/settings" className="fixed bottom-4 right-4 bg-[#FF6F00] text-white p-3 rounded-full shadow-lg hover:bg-[#e65c00] transition">⚙️</Link>
@@ -157,6 +224,7 @@ function SellerDashboard() {
         ))}
       </div>
     </div>
+    </>
   );
 }
 

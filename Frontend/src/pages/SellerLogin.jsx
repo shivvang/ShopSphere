@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../services/useSeller";
 import {useSelector,useDispatch} from "react-redux"
 import { signInFailure, signInRequest, signInSuccess } from "../redux/Seller/Features/sellerAuthSliceReducer";
+import Spinner from "../modules/common/Spinner";
+import toast from "react-hot-toast";
 
 
 function SellerLogin() {
@@ -11,7 +13,7 @@ function SellerLogin() {
           password:"",
       })
 
-      const { loading, error } = useSelector((state) => state.seller);
+      const { loading } = useSelector((state) => state.seller);
   
       const navigate = useNavigate();
       const dispatch = useDispatch();
@@ -24,15 +26,19 @@ function SellerLogin() {
       const result = await login({...formData,setFormData});
 
       if (result.success) {
-        dispatch(signInSuccess(result.sellerProfile))
+        dispatch(signInSuccess(result.sellerProfile));
+        toast.success("Login successful!");
         navigate("/seller/dashboard");
       } else {
-        dispatch(signInFailure(result.error))
+        dispatch(signInFailure(result.error));
+        toast.error(result.error);
       }
 
     }
 
   return (
+    <>
+    {loading && <Spinner/>}
     <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
     <div className="flex flex-col justify-center items-center sm:gap-7 md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
       <h1 className="text-3xl md:text-4xl font-bold text-white">Merchant Login</h1>
@@ -62,9 +68,16 @@ function SellerLogin() {
         <button className="w-full bg-[#FF6F00] text-white py-3 rounded-md font-semibold hover:bg-[#e65c00] transition">
           Merchant Login
         </button>
+        <button
+           type="button"
+           onClick={() => navigate("/seller")}
+           className="w-full border border-black text-black py-3 rounded-md font-semibold hover:bg-black hover:text-white transition">
+           Register as Merchant
+        </button>
       </form>
     </div>
   </div>
+  </>
   )
 }
 

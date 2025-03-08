@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom"
 import { register } from "../services/useSeller";
+import Spinner from "../modules/common/Spinner";
+import {toast} from "react-hot-toast"
 
 function SellerRegister() {
     const navigate = useNavigate();
@@ -12,21 +14,28 @@ function SellerRegister() {
         shopName:"",
       });
 
-      const [error, setError] = useState("");
+     
+      const [loading ,setLoading] = useState(false);
 
       const handleSubmit = async(e)=>{
         e.preventDefault();
-    
+
+        setLoading(true); 
         const result = await register({...formData,setFormData});
 
         if (result.success) {
+          toast.success("Registration successful! Redirecting...");
+          setLoading(false);
           navigate("/seller/login");
         } else {
-          setError(result.error);
+          toast.error(result.error);
+          setLoading(false);
         }
       }
     
   return (
+    <>
+    {loading && <Spinner/>}
     <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
     <div className="flex flex-col justify-center items-center sm:gap-7 md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
       <h1 className="text-3xl md:text-4xl font-bold text-white">
@@ -73,6 +82,7 @@ function SellerRegister() {
           Register as Merchant
         </button>
         <button
+          type="button"
           onClick={() => navigate("/seller/login")}
           className="w-full text-[#FF6F00] border border-[#FF6F00] py-3 rounded-md font-semibold hover:bg-[#FF6F00] hover:text-white transition"
         >
@@ -81,6 +91,7 @@ function SellerRegister() {
       </form>
     </div>
   </div>
+  </>
   )
 }
 
