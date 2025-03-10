@@ -35,15 +35,16 @@ export const searchProducts = async({searchQuery,category,brand,discount,price,r
 
 export const uploadFileAndGetUrl = async(file)=>{
     try {
-
+      console.log("file at use product",file);
         const formData = new FormData();
 
         formData.append('file', file);
 
-       const response = await axios.post(`${productRoute}/file/upload`,formData,{headers: {
+        console.log("formData mai bhi hain",formData.get("file"));
+
+        const response = await axios.post(`${productRoute}/file/upload`,formData,{headers: {
           'Content-Type': 'multipart/form-data', 
-        },
-        withCredentials:true}); 
+        },}); 
 
        if (!response.data.success) return { error: response.data.message || "upload failed." };
 

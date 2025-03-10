@@ -15,6 +15,7 @@ const app = express();
 
 //middlewares
 
+app.use(express.urlencoded({ extended: true })); 
 app.use(express.json())
 const corsOptions = {
     origin: process.env.FRONTEND_URL,

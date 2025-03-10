@@ -53,12 +53,23 @@ function SellerDashboard() {
   };
 
   const handleImageUpload = async (e) => {
+    e.persist();
     const file = e.target.files[0];
-    if (!file) return;
-
-    const uploadResponse = await uploadFileAndGetUrl(file);
-    if (uploadResponse.success) {
-      setFormData({ ...formData, imageUrl: uploadResponse.fileUrl });
+    if (!file || loading) return;
+    setLoading(true);
+    try {
+      console.log("Selected file main bhi hain:", file);
+      const uploadResponse = await uploadFileAndGetUrl(file);
+      if (uploadResponse.success) {
+        setFormData((prev) => ({ ...prev, imageUrl: uploadResponse.fileUrl }));
+        toast.success("Image uploaded successfully");
+      } else {
+        toast.error(uploadResponse.error);
+      }
+    } catch (error) {
+      toast.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
