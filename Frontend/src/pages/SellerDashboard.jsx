@@ -53,12 +53,10 @@ function SellerDashboard() {
   };
 
   const handleImageUpload = async (e) => {
-    e.persist();
     const file = e.target.files[0];
     if (!file || loading) return;
     setLoading(true);
     try {
-      console.log("Selected file main bhi hain:", file);
       const uploadResponse = await uploadFileAndGetUrl(file);
       if (uploadResponse.success) {
         setFormData((prev) => ({ ...prev, imageUrl: uploadResponse.fileUrl }));

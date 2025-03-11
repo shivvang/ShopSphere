@@ -231,15 +231,22 @@ export const uploadFileAndGetUrl = async (req, res) => {
 
     log.info(`Generated signed upload URL: ${uploadUrl}`);
 
-    
-    const response = await axios.put(uploadUrl, req.file.buffer, {
-      headers: {
-        "Content-Type": mimeType, 
-        "Content-Length": req.file.size,
-      },
-    });
+   
 
-    log.info(`File uploaded successfully, S3 Response: ${response.status}`);
+    try {
+       const response = await axios.put(uploadUrl, req.file.buffer, {
+        headers: {
+          "Content-Type": mimeType, 
+          "Content-Length": req.file.size,
+        },
+      });
+      log.info(`File uploaded successfully, S3 Response: ${response.status}`);
+    } catch (error) {
+      log.error("File upload to S3 failed:", error);
+      return res.status(500).json({ error: "Failed to upload file to S3" });
+    }
+
+    log.info(`File uploaded successfully on S3 `);
 
     // ✅ Get Signed Download URL
     const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
