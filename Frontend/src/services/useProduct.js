@@ -94,7 +94,7 @@ export const createProduct = async({ name,description,imageUrl,price,discount,ca
             return value.trim();
         });
 
-        const response = await axios.post(`${productRoute}/createProduct`,{name,description,imageUrl,price,discount,category,brand,tags:tagsArray,searchKeywords:searchKeywordsArray});
+        const response = await axios.post(`${productRoute}/createProduct`,{name,description,imageUrl,price,discount,category,brand,tags:tagsArray,searchKeywords:searchKeywordsArray},{withCredentials:true});
 
         if (!response.data.success) return { error: response.data.message || "Registration failed." };
 
