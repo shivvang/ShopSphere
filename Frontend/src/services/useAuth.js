@@ -23,9 +23,17 @@ export const register = async ({ phone, email, password, setFormData }) => {
 
     setFormData({ phone: "", email: "", password: "" });
 
-    return { success: true, message: "Successfully registered." };
+    return { success: true, message: "Successfully registered."};
+    
   } catch (error) {
-    return { error: error.response?.data?.message || "Something went wrong, try again." };
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 };
 
@@ -43,13 +51,61 @@ export const login = async({email,password,setFormData})=>{
       withCredentials: true,
     });
 
-    if (!response.data.success) return { error: response.data.message || "Registration failed." };
+    if (!response.data.success) return { error: response.data.message || "Login failed." };
 
     setFormData({ phone: "", email: "", password: "" });
 
-    return { success: true, message: "Successfully registered." };
+    return { success: true, message: "Successfully registered.",customer:response.data.user };
 
   } catch (error) {
-    return {error: error.response.data?.message || "Something went wrong, try again."};
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const logout = async()=>{
+  try {
+
+    const response = await axios.post(`${authRoute}logout`,{},{withCredentials:true});
+
+    if(!response.data.success) return { error: response.data.message || "logout failed." };
+
+    return { success: true, message: "successfully Logged out"};
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const resetPassword = async(oldPassword,newPassword)=>{
+  try {
+    const response = await axios.put(`${authRoute}reset-password`,{oldPassword,newPassword},{withCredentials:true});
+
+    if(!response.data.success) return { error: response.data.message || "reset failed." };
+
+    return { success: true, message: "successfully Logged out"};
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
   }
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import {useNavigate} from "react-router-dom"
 import { register } from "../services/useAuth.js";
 import { StoreIcon } from "lucide-react";
+import Spinner from "../modules/common/Spinner.jsx";
+import toast from "react-hot-toast";
 
 function Register() {
   const navigate = useNavigate();
@@ -9,31 +11,31 @@ function Register() {
     phone:"",
     email:"",
     password:"",
-  })
+  });
 
-  const [error, setError] = useState("");
+  const [loading,setLoading] = useState(false);
 
-  console.log("form data",
-    {
-      phone:formData.phone,
-      email:formData.email,
-      password:formData.password,
-    }
-  )
-  
   const handleSubmit= async(e)=>{
     e.preventDefault();
 
+    if(loading) return;
+
+    setLoading(true);
     const result = await register({ ...formData, setFormData });
 
     if (result.success) {
+      setLoading(false);
+      toast.success("You've successfully registered for ShopSphere!");
       navigate("/auth/login");
     } else {
-      setError(result.error);
+      setLoading(false);
+      toast.error(result.error);
     }
   }
 
   return (
+    <>
+    {loading && <Spinner/>}
     <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
       {/* Left Side - Branding Section */}
       <div className="flex flex-col justify-center items-center sm:gap-7  md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
@@ -82,6 +84,7 @@ function Register() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

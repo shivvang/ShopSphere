@@ -1,16 +1,30 @@
 /* eslint-disable react/prop-types */
 
+import { useState } from "react";
 import { searchProducts } from "../../services/useProduct";
-
+import {toast} from "react-hot-toast"
 
 function SearchFilter({searchFilter,setSearchFilter,setProducts}) {
+  const [loading,setLoading ] = useState(false);
 
   const handleSubmit = async(e) => {
     e.preventDefault(); 
 
+    if(loading) return;
+
+    setLoading(true);
+
     const  result = await searchProducts({...searchFilter});
 
-    setProducts(result.products);
+    if(result.products){
+      setLoading(false);
+      toast.success("");
+      setProducts(result.products);
+    }else{
+      setLoading(false);
+      toast.error(result.error);
+    }
+    
   }
 
   return (

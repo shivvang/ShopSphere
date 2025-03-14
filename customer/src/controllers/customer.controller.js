@@ -215,25 +215,10 @@ export const customerLogout = async (req, res, next) => {
     log.info("Logout endpoint hit");
 
     try {
-        const userId = req.userId;
-
-        if (!userId) {
-            log.warn("Unauthorized logout attempt (no userId in request)");
-            return next(new ApiError(401, "Unauthorized request"));
-        }
-
-        const accessToken = req.cookies.accessToken;
-        const refreshToken = req.cookies.refreshToken;
-
-        if (!accessToken || !refreshToken) {
-            log.warn("Missing tokens in logout request");
-            return next(new ApiError(400, "No active session found"));
-        }
-
         res.clearCookie("accessToken");
         res.clearCookie("refreshToken");
 
-        log.info("User logged out successfully", { userId });
+        log.info("User logged out successfully");
 
         return res.status(200).json({
             success: true,

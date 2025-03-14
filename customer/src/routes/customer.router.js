@@ -10,8 +10,8 @@ const customerRouter = express.Router();
 customerRouter.post("/register", customerRegister); 
 customerRouter.post("/login", customerLogin);  
 customerRouter.post("/reset-token", verifyRefreshTokenMiddleware,resetToken); 
-customerRouter.patch("/reset-password", verifyRefreshTokenMiddleware,resetPassword); 
-customerRouter.post("/logout", verifyRefreshTokenMiddleware,customerLogout); 
+customerRouter.put("/reset-password", verifyRefreshTokenMiddleware,resetPassword); 
+customerRouter.post("/logout",customerLogout); 
 customerRouter.delete("/delete", verifyRefreshTokenMiddleware, deleteCustomer);
 
 

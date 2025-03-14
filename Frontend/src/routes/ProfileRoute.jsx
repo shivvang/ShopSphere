@@ -1,4 +1,4 @@
-import {Routes,Route} from "react-router-dom";
+import {Routes,Route, Navigate} from "react-router-dom";
 import Profile from "../pages/Profile";
 import Wishlist from "../pages/Wishlist";
 import Cart from "../pages/Cart";
@@ -9,6 +9,7 @@ function ProfileRoute() {
     return (
       <Routes>
         <Route path="/" element={<Profile />}>
+          <Route index element={<Navigate to="settings" replace />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="cart" element={<Cart />} />
           <Route path="orders" element={<Orders />} />

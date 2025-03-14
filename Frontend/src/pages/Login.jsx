@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { login } from "../services/useAuth";
 import {useNavigate} from "react-router-dom"
+import toast from "react-hot-toast";
+import Spinner from "../modules/common/Spinner";
+import { useDispatch, useSelector } from "react-redux";
+import { signInRequest, signInSuccess, signOutFailure } from "../redux/Customer/features/customerAuthSliceReducer";
+
+
 
 function Login() {
 
@@ -9,24 +15,34 @@ function Login() {
         password:"",
     })
 
-    const [error, setError] = useState("");
+    const {loading} =  useSelector((state)=>state.customer);
 
+  
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleSubmit = async(e)=>{
       e.preventDefault();
 
+      dispatch(signInRequest());
+
       const result = await login({...formData,setFormData});
 
       if (result.success) {
+        dispatch(signInSuccess(result.customer))
+       
+        toast.success(`"Welcome back"`);
         navigate("/home");
       } else {
-        setError(result.error);
+        dispatch(signOutFailure());
+        toast.error(result.error);
       }
 
     }
 
     return (
+      <>
+      {loading && <Spinner/>}
         <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
        
           <div className="flex flex-col justify-center items-center sm:gap-7  md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
@@ -59,6 +75,7 @@ function Login() {
             </form>
           </div>
         </div>
+        </>
       );
 }
 
