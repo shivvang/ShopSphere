@@ -112,7 +112,7 @@ export const searchProducts = async (req, res, next) => {
 
     const { searchQuery, category, brand, discount, price, rating, sortOrder } = req.body;
     const searchPage = parseInt(req.query.page) || 1;
-    const pageSize = 10;
+    const pageSize = 9;
     const skipCount = (searchPage - 1) * pageSize;
 
     let filters = {};

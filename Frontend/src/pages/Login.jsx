@@ -68,7 +68,13 @@ function Login() {
                 value={formData.password}  
                 onChange={(e)=>setFormData((prev)=>({...prev,password:e.target.value}))} 
               />
-    
+              <button 
+                className="w-full text-[#FF6F00] border border-[#FF6F00] py-3 rounded-md font-semibold hover:bg-[#FF6F00] hover:text-white transition"
+                type="button"
+                onClick={()=>navigate("/auth/register")}
+              >
+               Register Instead
+              </button>
               <button className="w-full bg-[#FF6F00] text-white py-3 rounded-md font-semibold hover:bg-[#e65c00] transition">
                 Login
               </button>

@@ -88,6 +88,12 @@ function SellerRegister() {
         >
           Already a Merchant? Log in
         </button>
+        <button
+           type="button"
+           onClick={() => navigate("/auth")}
+           className="w-full border border-black text-black py-3 rounded-md font-semibold hover:bg-black hover:text-white transition">
+           Return to Customer Registration
+        </button>
       </form>
     </div>
   </div>

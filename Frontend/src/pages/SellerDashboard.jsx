@@ -225,8 +225,7 @@ function SellerDashboard() {
             <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover mb-2" />
             <h3 className="text-xl font-bold text-black">{product.name}</h3>
             <p className="text-gray-700">{product.description}</p>
-            <p className="font-semibold">Price: ₹{product.price}</p>
-            <p className="font-semibold">Discount: ₹{product.discount}</p>
+            <p className="font-semibold">Final Price : ₹{product.finalPrice}</p>
             <button onClick={() => setEditingProduct(product)} className="bg-[#FF6F00] text-white p-2 rounded-md mt-2 w-full">Edit</button>
             <button onClick={() => handleDeleteProduct(product.id)} className="bg-red-500 text-white p-2 rounded-md mt-2 w-full">Delete</button>
           </div>

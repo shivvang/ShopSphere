@@ -28,7 +28,7 @@ function Navbar({searchQuery,setSearchQuery}) {
       <div className="hidden md:flex flex-grow mx-4">
         <input 
           type="text" 
-          placeholder="Search for products, brands and more"
+          placeholder="Type and press Enter to search..."
           className="w-full p-2 rounded-lg text-black outline-none"
           onKeyDown={handleSearch} 
           value={searchQuery}
@@ -54,7 +54,7 @@ function Navbar({searchQuery,setSearchQuery}) {
         <div className="absolute top-16 left-0 w-full bg-[#FF6F00] shadow-md flex flex-col items-center space-y-4 py-4 md:hidden">
           <input 
             type="text" 
-            placeholder="Search..."
+            placeholder="Type and press Enter to search..."
             className="w-11/12 p-2 rounded-lg text-black outline-none"
             value={searchQuery}
             onChange={(e)=>setSearchQuery(e.target.value)}

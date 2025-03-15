@@ -1,31 +1,54 @@
 /* eslint-disable react/prop-types */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { searchProducts } from "../../services/useProduct";
 import {toast} from "react-hot-toast"
 
 function SearchFilter({searchFilter,setSearchFilter,setProducts}) {
+  
   const [loading,setLoading ] = useState(false);
 
-  const handleSubmit = async(e) => {
-    e.preventDefault(); 
-
-    if(loading) return;
+  const fetchProducts = async () => {
+    if (loading) return;
 
     setLoading(true);
 
-    const  result = await searchProducts({...searchFilter});
+    const result = await searchProducts({ ...searchFilter });
 
-    if(result.products){
+    if (result.products) {
       setLoading(false);
-      toast.success("");
+      toast.success("Fetched products successfully");
       setProducts(result.products);
-    }else{
+    } else {
       setLoading(false);
       toast.error(result.error);
     }
-    
-  }
+  };
+
+//   Step-by-Step Execution (simple yet crazy insane)
+// 1)The component renders.
+// 2)The useEffect runs:
+// 3)setTimeout starts a 500ms delay.
+// 4)User types a new character → searchFilter.searchQuery updates.
+// 5)Since searchFilter.searchQuery changed, useEffect runs again:
+// 6)clearTimeout(timeout) cancels the previous timeout.
+// 7)A new setTimeout starts.
+// 8)This cycle repeats until the user stops typing.
+// 9)After 500ms of inactivity, fetchProducts() finally runs once.
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchProducts();
+    }, 500);
+  
+    return () => clearTimeout(timeout);
+  }, [searchFilter.searchQuery]);
+
+ 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    fetchProducts();
+  };
 
   return (
     <div className="w-full md:w-[40%] lg:w-[30%] h-auto p-4 border-b md:border-r md:border-b-0 border-gray-300">

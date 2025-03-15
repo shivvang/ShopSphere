@@ -6,7 +6,7 @@ import authenticatedRequest from "../middleware/authMiddleware.js";
 const wishlistRouter = express.Router();
 wishlistRouter.use(authenticatedRequest);
 
-wishlistRouter.post("/add/:productId", addToWishlist);
+wishlistRouter.post("/add/:productId",addToWishlist);
 wishlistRouter.delete("/remove/:productId", removeFromWishlist);
 wishlistRouter.delete("/clear", clearWishlist);
 

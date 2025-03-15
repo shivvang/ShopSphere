@@ -1,5 +1,27 @@
+import { useState } from "react";
+import { addToWishlist } from "../../services/useShopping";
+import {toast} from "react-hot-toast";
+
 /* eslint-disable react/prop-types */
 function ProductCard({ product }) {
+    const [loading,setLoading] = useState(false);
+
+    const handleAddToWishlist = async(productId,name,imageUrl,price)=>{
+       
+      setLoading(true);
+      const data = await addToWishlist(productId,name,imageUrl,price);  
+
+      if(data.success){
+        setLoading(false)
+        toast.success("successfully added to wishlist");
+      }else{
+        setLoading(false)
+        toast.error(data.error);
+      }
+    }
+
+    
+
     return (
       <div className="border rounded-lg shadow-md p-4 w-full sm:w-64 bg-white">
       <img
@@ -24,10 +46,20 @@ function ProductCard({ product }) {
           <p className="font-bold"> ₹{product.price.toFixed(2)}</p>
         )}
       </div>
-    
-      <button className="mt-3 bg-[#FF6F00] text-white w-full py-2 rounded-lg hover:bg-[#e65c00]">
-        Buy Now
-      </button>
+        <button disabled={loading} className="mt-3 bg-[#F5F5F5] text-black w-full py-2 rounded-lg hover:bg-gray-300" onClick={()=>handleAddToWishlist(product._id,product.name,product.imageUrl,product.finalPrice)}>
+          Add to Wishlist
+        </button>
+
+      <div className="flex mt-3 gap-2">
+       
+        <button disabled={loading} className="bg-[#FF6F00] text-white w-1/2 py-2 rounded-lg hover:bg-[#e65c00]">
+          Add to Cart
+        </button>
+
+        <button disabled={loading} className="bg-[#333333] text-white w-1/2 py-2 rounded-lg hover:bg-[#1a1a1a]">
+          Buy Now
+        </button>
+      </div>
     </div>    
     );
   }

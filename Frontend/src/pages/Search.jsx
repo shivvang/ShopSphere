@@ -21,13 +21,10 @@ function Search({searchQuery}) {
     useEffect(() => {
       setSearchFilter((prevfilter)=>({...prevfilter,searchQuery:searchQuery}))
     },[searchQuery])
-
-    console.log("search filter here ",searchFilter);
+ 
 
   const [products,setProducts] = useState([]);
 
-
-  console.log("products found here are",products);
   return (
     <div className="flex flex-col md:flex-row py-4 px-4 md:px-10 lg:px-44 gap-4  min-h-screen">
       <SearchFilter searchFilter={searchFilter} setSearchFilter={setSearchFilter} setProducts={setProducts} />
