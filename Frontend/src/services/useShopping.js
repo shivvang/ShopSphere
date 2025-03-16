@@ -62,3 +62,67 @@ export const clearWishlistItem = async()=>{
       return { error: "Something went wrong. Please try again." };
 }
 }
+
+
+const CartRoute = "http://localhost:8000/v1/cart";
+
+
+export const addToCart = async (productId,name,imageUrl,price)=>{
+  try {
+    const response = await axios.post(`${CartRoute}/add/${productId}`,{name,imageUrl,price},{withCredentials:true});
+
+        if (!response.data.success) return { error: response.data.message || "add to cart failed." };
+
+        return { success: true, message: "Successfully added to Cart." };
+        
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const removeFromCart = async(productId)=>{
+  try {
+    const response = await axios.delete(`${CartRoute}/remove/${productId}`,{withCredentials:true});
+
+    if (!response.data.success) return { error: response.data.message || "remove from cart failed." };
+
+    return { success: true, message: "Successfully removed from Cart." };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const clearCart = async()=>{
+  try {
+    const response = await axios.delete(`${CartRoute}/clear`,{withCredentials:true});
+
+    if (!response.data.success) return { error: response.data.message || "remove from cart failed." };
+
+    return { success: true, message: "Successfully removed from Cart." };
+    
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}

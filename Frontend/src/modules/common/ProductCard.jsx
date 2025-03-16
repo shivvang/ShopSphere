@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addToWishlist } from "../../services/useShopping";
+import { addToCart, addToWishlist } from "../../services/useShopping";
 import {toast} from "react-hot-toast";
 
 /* eslint-disable react/prop-types */
@@ -21,6 +21,20 @@ function ProductCard({ product }) {
     }
 
     
+    
+    const handleAddToCart = async(productId,name,imageUrl,price)=>{
+       setLoading(true);
+
+       const data = await addToCart(productId,name,imageUrl,price);  
+
+      if(data.success){
+        setLoading(false)
+        toast.success("successfully added to Cart");
+      }else{
+        setLoading(false)
+        toast.error(data.error);
+      }
+    }
 
     return (
       <div className="border rounded-lg shadow-md p-4 w-full sm:w-64 bg-white">
@@ -52,7 +66,7 @@ function ProductCard({ product }) {
 
       <div className="flex mt-3 gap-2">
        
-        <button disabled={loading} className="bg-[#FF6F00] text-white w-1/2 py-2 rounded-lg hover:bg-[#e65c00]">
+        <button onClick={()=>handleAddToCart(product._id,product.name,product.imageUrl,product.finalPrice)} disabled={loading} className="bg-[#FF6F00] text-white w-1/2 py-2 rounded-lg hover:bg-[#e65c00]">
           Add to Cart
         </button>
 

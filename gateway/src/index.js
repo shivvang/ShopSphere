@@ -126,11 +126,6 @@ app.use("/v1/seller",proxy(process.env.PRODUCT_SERVICE_URL,{
 
 app.use("/v1/cart",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
     ...proxyOptions,
-    proxyReqOptDecorator:(proxyReqOpts,srcReq)=>{
-        proxyReqOpts.headers["Content-Type"] = "application/json",
-        proxyReqOpts.headers["x-user-id"] = srcReq.user.userId
-        return proxyReqOpts;
-    },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
         log.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
         return proxyResData;

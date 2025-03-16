@@ -9,7 +9,7 @@ export const addItemToCart = async (req, res, next) => {
     try {
         const userId = req.user;
         const productId = req.params.productId;
-        const { name, imageUrl, price, quantity } = req.body;
+        let  { name, imageUrl, price, quantity = 1 } = req.body;
 
         if (!productId || !name || !imageUrl || !price || quantity <= 0) {
             log.warn("Invalid input: Missing required fields or invalid quantity");
@@ -29,7 +29,8 @@ export const addItemToCart = async (req, res, next) => {
 
             if (existingItem) {
                 log.info(`Updating quantity for product ${productId}`);
-                existingItem.quantity += quantity;
+                quantity = existingItem.quantity + quantity
+                existingItem.quantity = quantity;
             } else {
                 log.info(`Adding new product ${productId} to cart`);
                 cart.items.push({ productId, name, imageUrl, price, quantity });
