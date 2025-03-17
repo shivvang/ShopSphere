@@ -10,7 +10,6 @@ import {rateLimit} from "express-rate-limit"
 import { ApiError } from "../src/utils/ApiError.js";
 import {RedisStore} from "rate-limit-redis";
 import proxy from "express-http-proxy";
-import validatetoken from "./Middleware/authenticateUser.js";
 import log from "./utils/logHandler.js";
 
 const app = express();
@@ -124,7 +123,7 @@ app.use("/v1/seller",proxy(process.env.PRODUCT_SERVICE_URL,{
 
 //Shopping service 
 
-app.use("/v1/cart",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
+app.use("/v1/cart",proxy(process.env.SHOPPING_SERVICE_URL,{
     ...proxyOptions,
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
         log.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
@@ -141,13 +140,8 @@ app.use("/v1/wishlist",proxy(process.env.SHOPPING_SERVICE_URL,{
 }))
 
 
-app.use("/v1/orders",validatetoken,proxy(process.env.SHOPPING_SERVICE_URL,{
+app.use("/v1/orders",proxy(process.env.SHOPPING_SERVICE_URL,{
     ...proxyOptions,
-    proxyReqOptDecorator:(proxyReqOpts,srcReq)=>{
-        proxyReqOpts.headers["Content-Type"] = "application/json",
-        proxyReqOpts.headers["x-user-id"] = srcReq.user.userId
-        return proxyReqOpts;
-    },
     userResDecorator:(proxyRes,proxyResData,userReq,userRes)=>{
         log.info(`Response received from Shopping service : ${proxyRes.statusCode}`)
         return proxyResData;

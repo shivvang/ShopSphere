@@ -1,36 +1,63 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { fetchOrders } from "../services/useProfile";
-
+import {toast} from "react-hot-toast";
+import { cancelOrder } from "../services/useShopping";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
-    const [error, setError] = useState("");
+  const [loading,setLoading]  = useState(false);
+  const [stateChange, setStateChange] = useState(false);
+
+
+  async function getOrders() {
+    const result = await fetchOrders();
+
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success("Order list loaded successfully!");
+      setOrders(result.orders);
+    }
+  }
   
     useEffect(() => {
-      async function getCart() {
-        const result = await fetchOrders();
+      if(stateChange) return;
+      getOrders();
+    }, [stateChange]);
+
+
+    const handleCancelOrder = async (productId) => {
+      if (loading) return;
+      setLoading(true);
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.productId === productId
+            ? { ...order, status: "cancelled" }
+            : order
+        )
+      );
   
-        if (result.error) {
-          setError(result.error);
-        } else {
-          setOrders(result.orders);
-        }
+      const response = await cancelOrder(productId);
+  
+      if (response.error) {
+        toast.error(response.error);
+      } else {
+        toast.success("Order successfully cancelled");
+        setStateChange(true); 
       }
   
-      getCart();
-    }, []);
-  
-
+      setLoading(false);
+    };
+    
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <h2 className="text-3xl font-bold text-white mb-4">Your Orders</h2>
-      {error && <p className="text-red-500">{error}</p>}
-
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {orders.length > 0 ? (
           orders.map((order) => (
-            <OrderProduct key={order.productId} order={order} />
+            <OrderProduct key={order.productId} order={order} handleCancelOrder={handleCancelOrder} />
           ))
         ) : (
           <p className="text-gray-400">You haven&apos;t placed any orders yet.</p>
@@ -42,7 +69,7 @@ function Orders() {
 
 export default Orders;
 
-function OrderProduct({ order }) {
+function OrderProduct({ order ,handleCancelOrder}) {
   const statusColors = {
     shipped: "bg-yellow-500",
     delivered: "bg-green-500",
@@ -64,6 +91,9 @@ function OrderProduct({ order }) {
       >
         {order.status.toUpperCase()}
       </span>
+      <button onClick={()=>handleCancelOrder(order.productId)} className="bg-red-500 text-white px-4 py-2 rounded-lg mt-3 shadow-md hover:bg-red-600 transition duration-200">
+        Cancel Order
+      </button>
     </div>
   );
 }

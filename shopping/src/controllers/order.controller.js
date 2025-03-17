@@ -10,7 +10,7 @@ export const setOrder = async (req, res, next) => {
     try {
         const userId = req.user;
         const productId = req.params.productId;
-        const { name, imageUrl, priceAtPurchase, quantity } = req.body;
+        let { name, imageUrl, priceAtPurchase, quantity = 1 } = req.body;
 
         if (!userId || !productId || !quantity || quantity <= 0 || !priceAtPurchase || priceAtPurchase <= 0) {
             log.warn("Invalid request: Missing or invalid fields.");
@@ -22,33 +22,35 @@ export const setOrder = async (req, res, next) => {
         if (order) {
             log.info(`Order exists for product ${productId} by user ${userId}. Updating quantity.`);
             
-            const item = order.items.find(item => item.productId.toString() === productId);
-            if (item) {
-                item.quantity += quantity;
-                await order.save();
-                return res.status(200).json({ message: "Order updated successfully", order });
-            }
-        } else {
-            order = new Order({
-                userId,
-                items: [{ productId, name, imageUrl, priceAtPurchase, quantity}],
+            return res.status(400).json({ 
+                message: `Order for product ${productId} already exists. Cannot place another order for the same product.` 
             });
-        }
+
+        } 
+           
+        order = new Order({
+            userId,
+            items: [{ productId, name, imageUrl, priceAtPurchase, quantity}],
+        });
 
         await order.save();
 
-        log.info(`New order created For User ${userId} and Product ordered ${productId}`);
+        log.info(`Order saved for user ${userId} and product ${productId}.`);
 
-        const delay = Date.now() + 7 * 24 * 60 * 60 * 1000;//in milli seconds
+       
+        const jobData = { userId, productId, priceAtPurchase, quantity };
 
-        const jobData = {userId, productId, priceAtPurchase, quantity };
+       
+        const delay = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
-        await deliveryQueue.add("processOrder", jobData, {
-            jobId: userId._id.toString(),
-            delay:delay ,
-            removeOnComplete: true,
-            removeOnFail: false,
-        });
+        log.info(`Adding new job for user ${userId}`);
+            await deliveryQueue.add("processOrder", jobData, {
+                jobId: productId.toString(),
+                delay, 
+                removeOnComplete: true,
+                removeOnFail: false,
+            });    
+        
 
         await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
 
@@ -79,23 +81,31 @@ export const cancelOrder = async (req, res, next) => {
             return next(new ApiError("No active order found to cancel.", 404));
         }
 
-        order.items = order.items.map(item => {
-            if (item.productId.toString() === productId) {
+        let itemCancelled = false;
+
+        order.items.forEach(item => {
+            if (item.productId.toString() === productId && item.status !== "cancelled") {
                 item.status = "cancelled";
+                itemCancelled = true;
             }
-            return item;
         });
 
-        if (order.items.every(item => item.status === "cancelled")) {
-            order.status = "cancelled";
+        if (!itemCancelled) {
+            log.info(`Order item ${productId} was already cancelled.`);
+            return res.status(400).json({ message: "This product has already been cancelled." });
         }
 
         await order.save();
-        // log.info(`Order updated after cancellation: ${order._id}`);
+        log.info(`Order updated after cancellation: ${order._id}`);
 
-        // const jobId = order._id.toString();
-        // await deliveryQueue.getJob(jobId).then(job => job?.remove());
-
+        const jobId = productId.toString();
+        const job = await deliveryQueue.getJob(jobId);
+        if (job) {
+            await job.remove();
+            log.info(`Job with ID ${jobId} removed from delivery queue.`);
+        } else {
+            log.warn(`No job found with ID ${jobId} in delivery queue.`);
+        }
         await publishEventToExchange("order.cancel", { userId, productId });
 
         return res.status(200).json({ message: "Order cancelled successfully.", order });

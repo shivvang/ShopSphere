@@ -126,3 +126,45 @@ export const clearCart = async()=>{
     return { error: "Something went wrong. Please try again." };
   }
 }
+
+const orderRoute = "http://localhost:8000/v1/orders";
+
+export const setOrder = async(productId,name,imageUrl,priceAtPurchase)=>{
+  try {
+    const response = await axios.post(`${orderRoute}/add/${productId}`,{name,imageUrl,priceAtPurchase}, {withCredentials:true});
+
+    if (!response.data.success) return { error: response.data.message || "failed to set order." };
+
+    return { success: true, message: "Successfully ordered." };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const cancelOrder = async(productId)=>{
+  try {
+    const response = await axios.delete(`${orderRoute}/remove/${productId}`, {withCredentials:true});
+
+    if (!response.data.success) return { error: response.data.message || "failed to set order." };
+
+    return { success: true, message: "Successfully ordered." };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}

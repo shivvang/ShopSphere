@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addToCart, addToWishlist } from "../../services/useShopping";
+import { addToCart, addToWishlist, setOrder } from "../../services/useShopping";
 import {toast} from "react-hot-toast";
 
 /* eslint-disable react/prop-types */
@@ -30,6 +30,20 @@ function ProductCard({ product }) {
       if(data.success){
         setLoading(false)
         toast.success("successfully added to Cart");
+      }else{
+        setLoading(false)
+        toast.error(data.error);
+      }
+    }
+
+    const handleBuyNow = async(productId,name,imageUrl,priceAtPurchase)=>{
+      setLoading(true);
+
+      const data = await setOrder(productId,name,imageUrl,priceAtPurchase);
+
+      if(data.success){
+        setLoading(false)
+        toast.success("successfully Order");
       }else{
         setLoading(false)
         toast.error(data.error);
@@ -70,7 +84,7 @@ function ProductCard({ product }) {
           Add to Cart
         </button>
 
-        <button disabled={loading} className="bg-[#333333] text-white w-1/2 py-2 rounded-lg hover:bg-[#1a1a1a]">
+        <button onClick={()=>handleBuyNow(product._id,product.name,product.imageUrl,product.finalPrice)} disabled={loading} className="bg-[#333333] text-white w-1/2 py-2 rounded-lg hover:bg-[#1a1a1a]">
           Buy Now
         </button>
       </div>
