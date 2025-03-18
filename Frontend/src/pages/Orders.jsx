@@ -50,14 +50,13 @@ function Orders() {
   
       setLoading(false);
     };
-    
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <h2 className="text-3xl font-bold text-white mb-4">Your Orders</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {orders.length > 0 ? (
           orders.map((order) => (
-            <OrderProduct key={order.productId} order={order} handleCancelOrder={handleCancelOrder} />
+            <OrderProduct key={`${order.productId}-${order._id}`} order={order} handleCancelOrder={handleCancelOrder} />
           ))
         ) : (
           <p className="text-gray-400">You haven&apos;t placed any orders yet.</p>

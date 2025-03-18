@@ -20,9 +20,10 @@ export const addOrderToCustomer = async(event)=>{
 
         const existingItem = customer.orders.find(item => item.productId.equals(productId));
 
-        if (existingItem) {
-            existingItem.quantity = quantity;
-        } else {
+        if (existingItem && existingItem.status !== "cancelled") {
+            log.warn("Product is already ordered");
+            throw new ApiError(400, "Order already exists.");
+        }else {
             customer.orders.push({ productId, quantity ,name, imageUrl, priceAtPurchase });
         }
 

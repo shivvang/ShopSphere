@@ -17,7 +17,7 @@ export const setOrder = async (req, res, next) => {
             return next(new ApiError("Invalid request. Ensure all required fields are provided correctly.", 400));
         }
 
-        let order = await Order.findOne({ userId, "items.productId": productId });
+        let order = await Order.findOne({ userId, "items.productId": productId,"items.status": { $ne: "cancelled" } });
 
         if (order) {
             log.info(`Order exists for product ${productId} by user ${userId}. Updating quantity.`);
@@ -75,7 +75,7 @@ export const cancelOrder = async (req, res, next) => {
             return next(new ApiError("User ID and Product ID are required.", 400));
         }
 
-        const order = await Order.findOne({ userId, "items.productId": productId });
+        const order = await Order.findOne({ userId, "items.productId": productId ,"items.status": { $ne: "cancelled" } });
         if (!order) {
             log.warn(`No active order found for user: ${userId} and product: ${productId}`);
             return next(new ApiError("No active order found to cancel.", 404));

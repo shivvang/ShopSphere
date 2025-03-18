@@ -8,6 +8,7 @@ import Spinner from "../modules/common/Spinner";
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [stateChange,setStateChange] = useState(false);
 
   async function getWishlist() {
     const result = await fetchWishlist();
@@ -22,8 +23,9 @@ export default function Wishlist() {
 
 
   useEffect(() => {
+    if(stateChange) return;
     getWishlist();
-  }, []);
+  }, [stateChange]);
 
   const handleClearWishlist = async () => {
     if (loading) return;
@@ -37,12 +39,7 @@ export default function Wishlist() {
   
     if (response.success) {
       toast.success("Cleared wishlist");
-  
-     
-      setTimeout(async () => {
-        const updatedWishlist = await fetchWishlist();
-        setWishlist(updatedWishlist.wishlist);
-      }, 500);
+      setStateChange(true);
     } else {
       toast.error(response.error);
     }
@@ -62,12 +59,7 @@ export default function Wishlist() {
   
     if (response.success) {
       toast.success("Removed from wishlist");
-  
-   
-      setTimeout(async () => {
-        const updatedWishlist = await fetchWishlist();
-        setWishlist(updatedWishlist.wishlist);
-      }, 500); 
+      setStateChange(true);
     } else {
       toast.error(response.error);
     }

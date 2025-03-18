@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { fetchCart } from "../services/useProfile";
 import toast from "react-hot-toast";
 import Spinner from "../modules/common/Spinner";
-import { clearCart, removeFromCart } from "../services/useShopping";
+import { clearCart, removeFromCart, setOrder } from "../services/useShopping";
 
 function Cart() {
     const [cart, setCart] = useState([]);
     const [loading,setLoading] = useState(false);
+    const [stateChange,setStateChange] = useState(false);
 
     async function getCart() {
       const result = await fetchCart();
@@ -21,8 +22,9 @@ function Cart() {
     }
   
     useEffect(() => {
+      if(stateChange) return;
       getCart();
-    }, []);
+    }, [stateChange]);
   
     const handleRemoveFromCart = async(productId)=>{
 
@@ -36,11 +38,7 @@ function Cart() {
 
          if(response.success){
           toast.success("Removed from Cart");
-          setTimeout(async () => {
-                  const updatedCart = await getCart();
-                  setCart(updatedCart.cart);
-                }, 500); 
-
+          setStateChange(true);
          }else{
           toast.error(response.error);
          }
@@ -58,16 +56,40 @@ function Cart() {
 
         if(response.success){
           toast.success("Cleared Cart");
-           setTimeout(async () => {
-                  const updatedCart = await getCart();
-                  setCart(updatedCart.cart);
-                }, 500);
-
+          setStateChange(true);
         }else{
           toast.error(response.error);
         }
         setLoading(false);
-      }
+      } 
+      
+      const handleOrderNow = async (productId, name, imageUrl, priceAtPurchase) => {
+        if (loading) return;
+      
+        setLoading(true);
+      
+        setCart((prev) => prev.filter((item) => item.productId !== productId));
+      
+        try {
+          const [removeResponse, orderResponse] = await Promise.all([
+            removeFromCart(productId),
+            setOrder(productId, name, imageUrl, priceAtPurchase)
+          ]);
+      
+          if (orderResponse.success) {
+            toast.success("Ordered successfully");
+          } else {
+            toast.error(orderResponse.error || "Failed to place order");
+          }
+      
+          if (!removeResponse.success) {
+            toast.error(removeResponse.error || "Failed to sync cart with backend");
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
+      
 
   return ( 
     <>
@@ -87,7 +109,7 @@ function Cart() {
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cart.length > 0 ? (
             cart.map((item) => (
-                <CartProduct key={item.productId} product={item} handleRemoveFromCart={handleRemoveFromCart } />
+                <CartProduct key={item.productId} product={item} handleRemoveFromCart={handleRemoveFromCart } handleOrderNow={handleOrderNow} />
             ))
         ) : (
             <p className="text-gray-400">Your cart is empty</p>
@@ -101,7 +123,7 @@ function Cart() {
 export default Cart
 
 
-function CartProduct({ product ,handleRemoveFromCart }) {
+function CartProduct({ product ,handleRemoveFromCart,handleOrderNow }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center transition-transform hover:scale-105">
       <img
@@ -116,8 +138,8 @@ function CartProduct({ product ,handleRemoveFromCart }) {
         <button className="bg-[#FF6F00] text-white px-3 py-2 rounded-lg hover:bg-orange-700 transition" onClick={()=>handleRemoveFromCart(product.productId)}>
           Remove
         </button>
-        <button className="bg-black text-white px-3 py-2 rounded-lg border border-gray-400 hover:bg-gray-900 transition">
-          Checkout
+        <button onClick={()=>handleOrderNow(product.productId,product.name,product.imageUrl,product.price)} className="bg-black text-white px-3 py-2 rounded-lg border border-gray-400 hover:bg-gray-900 transition">
+          Order Now
         </button>
       </div>
     </div>
