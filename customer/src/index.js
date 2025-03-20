@@ -10,7 +10,7 @@ import {customerRouter,addressRouter} from "./routes/router.js"
 import { consumeRabbitMQEvent, initializeRabbitMQ } from "./queue/rabbitmq.js";
 import { addWishlistToCustomer, clearWishlistToCustomer, deleteWishlistToCustomer } from "./eventHandlers/wishlist.eventHandler.js";
 import { addCartToCustomer, clearCartToCustomer, deleteCartToCustomer } from "./eventHandlers/cart.eventHandler.js";
-import { addOrderToCustomer, deleteOrderToCustomer, processOrder } from "./eventHandlers/order.eventHandler.js";
+import { addOrderToCustomer, createOrderFromCheckout, deleteOrderToCustomer, processOrder } from "./eventHandlers/order.eventHandler.js";
 import { handleProductDeletion, handleProductUpdation } from "./eventHandlers/product.eventHandler.js";
 
 
@@ -59,7 +59,7 @@ async function initializeCustomerService(){
         await consumeRabbitMQEvent("order.place",addOrderToCustomer)
         await consumeRabbitMQEvent("order.cancel",deleteOrderToCustomer);
         await consumeRabbitMQEvent("order.processed",processOrder);
-
+        await consumeRabbitMQEvent("order.checkout",createOrderFromCheckout);
 
         //Product
         await consumeRabbitMQEvent("product.delete",handleProductDeletion);

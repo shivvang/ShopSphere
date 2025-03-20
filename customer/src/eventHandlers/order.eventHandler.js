@@ -107,3 +107,58 @@ export const processOrder = async (event) => {
         throw new ApiError(error.statusCode || 500, error.message || "Internal Server Error");
     }
 };
+
+export const createOrderFromCheckout = async (event) => {
+    try {
+        const { userId, items } = event;
+
+        if (!userId || !items || items.length === 0) {
+            log.warn("Missing required fields: userId or items", { userId, items });
+            throw new ApiError(400, "Invalid request: userId and items are required.");
+        }
+
+        const customer = await Customer.findById(userId);
+
+        if (!customer) {
+            log.warn(`Customer not found: ${userId}`);
+            throw new ApiError(404, "Customer not found.");
+        }
+
+        for (const item of items) {
+          
+            const existingOrder = customer.orders.find(order =>
+                order.productId.toString() === item.productId.toString()
+            );
+
+            if (existingOrder) {
+                if (existingOrder.status !== "cancelled") {
+                    log.warn(`Duplicate order for product ${item.productId} with status: ${existingOrder.status}`);
+                    throw new ApiError(400, `Product ${item.productId} is already ordered and not cancelled.`);
+                }
+            }
+
+           
+            customer.orders.push({
+                productId: item.productId,
+                name: item.name,
+                imageUrl: item.imageUrl,
+                priceAtPurchase: item.priceAtPurchase,
+                quantity: item.quantity,
+                status: item.status || "shipped"
+            });
+        }
+
+       
+        await customer.save();
+
+        log.info(`Order created successfully for User: ${userId}`);
+        return { success: true, message: "Order created successfully." };
+
+    } catch (error) {
+        log.error(`Error processing order for User: ${event.userId}`, { 
+            error: error.message, 
+            stack: error.stack 
+        });
+        throw new ApiError(error.statusCode || 500, error.message || "Internal Server Error");
+    }
+};

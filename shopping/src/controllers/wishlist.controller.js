@@ -40,7 +40,7 @@ export const addToWishlist = async (req, res, next) => {
 
         await publishEventToExchange("wishlist.itemAdded", { userId,productId,name, imageUrl, price});
         await wishlist.save();
-        return res.status(201).json({ message: "Product successfully added to wishlist" });
+        return res.status(201).json({success: true, message: "Product successfully added to wishlist" });
     } catch (error) {
         log.error("Error adding product to wishlist", error);
         return next(new ApiError("Unable to add product to wishlist. Please try again later.", 500));
@@ -79,7 +79,7 @@ export const removeFromWishlist = async (req, res, next) => {
         log.info(`Removed product ${productId} from wishlist for user: ${userId}`);
         await publishEventToExchange("wishlist.itemRemoved", { userId: userId.toString(), productId: productId.toString() });
 
-        return res.status(200).json({ message: "Product successfully removed from wishlist" });
+        return res.status(200).json({success: true, message: "Product successfully removed from wishlist" });
     } catch (error) {
         log.error("Error removing product from wishlist", error);
         return next(new ApiError("Unable to remove product from wishlist. Please try again later.", 500));
@@ -112,7 +112,7 @@ export const clearWishlist = async (req, res, next) => {
         log.info(`Wishlist successfully cleared for user: ${userId}`);
         await publishEventToExchange("wishlist.cleared", { userId: userId.toString(), cleared: true });
 
-        return res.status(200).json({ message: "Wishlist cleared successfully" });
+        return res.status(200).json({ success: true,message: "Wishlist cleared successfully" });
     } catch (error) {
         log.error("Error clearing wishlist", error);
         return next(new ApiError("Unable to clear wishlist. Please try again later.", 500));

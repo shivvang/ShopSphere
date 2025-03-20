@@ -83,7 +83,7 @@ export const removeItemFromCart = async (req, res, next) => {
         }
 
         await cart.save();
-        return res.status(200).json({ message: "Item removed successfully", cart });
+        return res.status(200).json({success: true, message: "Item removed successfully", cart });
     } catch (error) {
         log.error("Error removing item from cart", error);
         return next(new ApiError("Failed to remove item from cart", 500));
@@ -111,7 +111,7 @@ export const clearCart = async (req, res, next) => {
         log.info(`Cart cleared successfully for user: ${userId}`);
         await publishEventToExchange("cart.delete", { userId, all: true });
 
-        return res.status(200).json({ message: "Cart cleared successfully" });
+        return res.status(200).json({ success: true,message: "Cart cleared successfully" });
     } catch (error) {
         log.error("Error clearing the cart", error);
         return next(new ApiError("Failed to clear the cart", 500));

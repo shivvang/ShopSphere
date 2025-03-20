@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { fetchCart } from "../services/useProfile";
 import toast from "react-hot-toast";
 import Spinner from "../modules/common/Spinner";
-import { clearCart, removeFromCart, setOrder } from "../services/useShopping";
+import { checkoutOrder, clearCart, removeFromCart, setOrder } from "../services/useShopping";
 
 function Cart() {
     const [cart, setCart] = useState([]);
@@ -90,7 +90,40 @@ function Cart() {
         }
       };
       
+      const handleCheckOut = async (cart) => {
+        if (loading) return;
+    
+        setLoading(true);
 
+        setCart([]);
+        
+        try {
+            const [removeResponse, orderResponse] = await Promise.all([
+                clearCart(),
+                checkoutOrder(cart)
+            ]);
+    
+            if (orderResponse.success) {
+                toast.success("Successful Order");
+                if (orderResponse.warning) toast.error(orderResponse.warning);
+    
+                if (removeResponse.success) {
+                    toast.success("Cart cleared");
+                } else {
+                    toast.error("Failed to clear cart");
+                }
+            } else {
+                toast.error(orderResponse.error);
+            }
+        } catch (error) {
+            toast.error("An error occurred during checkout");
+            console.error("Checkout error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    
   return ( 
     <>
     {loading && <Spinner/>}
@@ -116,6 +149,16 @@ function Cart() {
         )}
      </div>
    </div>
+   {cart.length > 1 && (
+      <div className="fixed bottom-0 left-0 w-full bg-black py-3 shadow-lg flex justify-center">
+        <button
+          onClick={() =>handleCheckOut(cart) }
+          className="bg-[#FF6F00] text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-orange-700 transition"
+        >
+        {  `Proceed to Buy (${cart.length} items)`}
+        </button>
+      </div>
+    )}
    </>
   )
 }

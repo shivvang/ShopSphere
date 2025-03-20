@@ -55,7 +55,7 @@ export const setOrder = async (req, res, next) => {
         await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
 
         log.info(`Order processing event published for order: ${order._id}`);
-        return res.status(201).json({ message: "Order placed successfully", order });
+        return res.status(201).json({ success: true, message: "Order placed successfully", order });
 
     } catch (error) {
         log.error("Error placing order", error);
@@ -108,9 +108,112 @@ export const cancelOrder = async (req, res, next) => {
         }
         await publishEventToExchange("order.cancel", { userId, productId });
 
-        return res.status(200).json({ message: "Order cancelled successfully.", order });
+        return res.status(200).json({ success: true, message: "Order cancelled successfully.", order });
     } catch (error) {
         log.error("Error cancelling order:", error);
         return next(new ApiError("Failed to cancel order. Please try again later.", 500));
+    }
+};
+
+export const checkoutCart = async (req, res, next) => {
+    log.info("Starting checkout process");
+    try {
+        const userId = req.user;
+        const { arrayOfProducts } = req.body;
+
+        if (!arrayOfProducts || arrayOfProducts.length === 0) {
+            return next(new ApiError("Cart is empty", 400));
+        }
+
+        const validProducts = [];
+        const alreadyOrderedProducts = [];
+
+        for (const item of arrayOfProducts) {
+            const existingOrder = await Order.findOne({
+                userId,
+                "items.productId": item.productId,
+                "items.status": { $nin: ["cancelled"] }
+            });
+
+            if (existingOrder) {
+                log.warn(`Product ${item.productId} is already ordered`);
+                alreadyOrderedProducts.push(item.name);
+            } else {
+                validProducts.push(item);
+            }
+        }
+        
+        let order;
+      
+        if (validProducts.length > 0) {
+                order = await Order.create({
+                userId,
+                items: validProducts.map(item => ({
+                    productId: item.productId,
+                    name: item.name,
+                    imageUrl: item.imageUrl,
+                    priceAtPurchase: item.price,
+                    quantity: item.quantity,
+                }))
+            });
+        
+            log.info(`Order created for user ${userId}`);
+        } else {
+            return next(new ApiError("All selected products are already ordered", 400));
+        }
+
+        log.info(`Order created successfully with ID: ${order._id}`);
+
+       
+        // const delay = Date.now() + 7 * 24 * 60 * 60 * 1000; 
+
+        // const jobData = {
+        //     userId,
+        //     items: order.items.map(item => ({
+        //         productId: item.productId,
+        //         name: item.name,
+        //         priceAtPurchase: item.price,
+        //         quantity: item.quantity
+        //     }))
+        // };
+
+        // await deliveryQueue.add("processOrder", jobData, {
+        //     jobId: `order_${order._id}`,
+        //     delay,
+        //     removeOnComplete: true,
+        //     removeOnFail: false,
+        // });
+
+        // log.info(`Added delivery job for order: ${order._id}`);
+
+       
+        await publishEventToExchange("order.checkout", {
+            userId,
+            items: order.items.map(item => ({
+                productId: item.productId,
+                name: item.name,
+                imageUrl:item.imageUrl,
+                priceAtPurchase: item.priceAtPurchase,
+                quantity: item.quantity,
+                status: item.status
+            }))
+        });
+
+        log.info(`Order processing event published for order: ${order._id}`);
+
+       
+        return res.status(201).json({
+            success: true,
+            message: "Order placed successfully",
+            orderId: order._id,
+            items: order.items,
+            warning: alreadyOrderedProducts.length
+            ? `Some products were already ordered and skipped: ${alreadyOrderedProducts.join(", ")}`
+            : undefined
+        });
+        
+    } catch (error) {
+        log.error("Error placing order", error);
+        return next(new ApiError("Failed to place order. Please try again later.", 500));
     }
 };

@@ -168,3 +168,23 @@ export const cancelOrder = async(productId)=>{
     return { error: "Something went wrong. Please try again." };
   }
 }
+
+export const checkoutOrder = async(cart)=>{
+  try {
+    const response = await axios.post(`${orderRoute}/order/checkout`,{arrayOfProducts:cart},{withCredentials:true});
+
+    if (!response.data.success) return { error: response.data.message || "failed to set order." };
+
+    return { success: true, message: "Successfully ordered." };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
