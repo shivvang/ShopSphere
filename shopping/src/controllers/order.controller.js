@@ -167,24 +167,23 @@ export const checkoutCart = async (req, res, next) => {
        
         // const delay = Date.now() + 7 * 24 * 60 * 60 * 1000; 
 
-        // const jobData = {
-        //     userId,
-        //     items: order.items.map(item => ({
+        // for (const item of order.items) {
+        //     await deliveryQueue.add("processOrder", {
+        //         userId,
         //         productId: item.productId,
-        //         name: item.name,
-        //         priceAtPurchase: item.price,
-        //         quantity: item.quantity
-        //     }))
-        // };
-
-        // await deliveryQueue.add("processOrder", jobData, {
-        //     jobId: `order_${order._id}`,
-        //     delay,
-        //     removeOnComplete: true,
-        //     removeOnFail: false,
-        // });
-
-        // log.info(`Added delivery job for order: ${order._id}`);
+        //         priceAtPurchase: item.priceAtPurchase,
+        //         quantity: item.quantity,
+        //         orderId: order._id,
+        //         totalItemsCount: order.items.length, 
+        //     }, {
+        //         jobId: `order_${order._id}_${item.productId}`,
+        //         delay,
+        //         removeOnComplete: true,
+        //         removeOnFail: false,
+        //     });
+        // }
+        
+        // log.info(`Added delivery jobs for order: ${order._id}`);
 
        
         await publishEventToExchange("order.checkout", {
