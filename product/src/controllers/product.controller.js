@@ -161,6 +161,39 @@ export const searchProducts = async (req, res, next) => {
 };
 
 
+export const getRandomProducts = async (req, res, next) => {
+  log.info("Get Random products endpoint hit...");
+  
+  try {
+    const noOfProduct = parseInt(req.params.noOfProduct) || 5;
+    if (isNaN(noOfProduct) || noOfProduct <= 0 || noOfProduct > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid number of products requested",
+      });
+    }
+
+    const products = await Product.aggregate([
+      { $sample: { size: noOfProduct } },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Products fetched successfully",
+      products: products,
+    });
+
+  } catch (error) {
+    log.error("Error in fetching random products:", error);
+    
+    if (error.name === "MongoError") {
+      return next(new ApiError(500, "Database error occurred", error));
+    }
+    return next(new ApiError(500, "Internal server error", error));
+  }
+};
+
+
 export const updateProduct = async (req, res, next) => {
   log.info("Update product endpoint hit...");
 
