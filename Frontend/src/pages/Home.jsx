@@ -31,9 +31,9 @@ function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen  w-screen">
-        <MainContent products={products}/>
-    </div>
+    <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
+    <MainContent products={products} />
+  </div>
   )
 }
 
