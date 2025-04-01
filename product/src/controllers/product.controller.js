@@ -194,6 +194,79 @@ export const getRandomProducts = async (req, res, next) => {
 };
 
 
+export const getLatestProducts = async(req,res,next)=>{
+
+  log.info("Get Latest products endpoint hit...");
+  try {
+
+    const products = await Product.find({}).sort({createdAt:-1}).limit(10);
+
+    return res.status(200).json({
+      success: true,
+      message: "Products fetched successfully",
+      products: products,
+    });
+
+  } catch (error) {
+    log.error("Error in fetching latest products:", error);
+    
+    if (error.name === "MongoError") {
+      return next(new ApiError(500, "Database error occurred", error));
+    }
+    return next(new ApiError(500, "Internal server error", error));
+  }
+}
+
+export const flashSaleProducts =async(req,res,next)=>{
+  try {
+
+      const products = await Product.find({ discount: { $gte: 30 } })
+      .sort({ discount: -1 }) 
+      .limit(10);
+
+    return res.status(200).json({
+      success: true,
+      message: "Products fetched successfully",
+      products: products,
+    });
+
+  } catch (error) {
+    log.error("Error in fetching saled products:", error);
+    
+    if (error.name === "MongoError") {
+      return next(new ApiError(500, "Database error occurred", error));
+    }
+    return next(new ApiError(500, "Internal server error", error));
+  }
+}
+
+export const recommendedProducts  = async(req,res,next)=>{
+  try {
+    const userId = req.userId;
+
+    const user = await Customer.findById(userId);
+
+    const recommendedProducts = await Product.find({
+      $or: [
+        { category: { $in: user.wishlist.map(w => w.category) } },
+        { tags: { $in: user.wishlist.flatMap(w => w.tags) } }
+      ]
+      })
+    .limit(10);
+
+     
+
+  } catch (error) {
+    log.error("Error fetching recommended products:", error);
+    
+    if (error.name === "MongoError") {
+      return next(new ApiError(500, "Database error occurred", error));
+    }
+    return next(new ApiError(500, "Internal server error", error));
+  }
+}
+
+
 export const updateProduct = async (req, res, next) => {
   log.info("Update product endpoint hit...");
 

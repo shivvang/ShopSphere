@@ -20,4 +20,7 @@ customerRouter.get("/wishlist", validatetoken,customerWishlist);
 customerRouter.get("/cart",validatetoken, customerCart);
 customerRouter.get("/orders", validatetoken,customerOrders);
 
+
+//recommendation
+customerRouter.get("",);
 export default customerRouter;

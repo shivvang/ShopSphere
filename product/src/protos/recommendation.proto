@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package recommendation;
+
+// Define the service
+service RecommendationService {
+  rpc GetRecommendations (RecommendationRequest) returns (RecommendationResponse);
+}
+
+// Request structure
+message RecommendationRequest {
+  string userId = 1; // User ID from Customer Service
+}
+
+// Response structure
+message RecommendationResponse {
+  repeated Product products = 1; // Array of products
+}
+
+// Product structure
+message Product {
+  string id = 1;
+  string name = 2;
+  string imageUrl = 3;
+  float price = 4;
+}
