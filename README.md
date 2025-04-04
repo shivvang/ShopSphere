@@ -1,4 +1,3 @@
-Here's your **README.md** file for the **ShopSphere** project in Markdown format with emojis and proper structuring:  
 
 ---
 
