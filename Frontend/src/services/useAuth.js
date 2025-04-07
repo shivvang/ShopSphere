@@ -109,3 +109,24 @@ export const resetPassword = async(oldPassword,newPassword)=>{
     return { error: "Something went wrong. Please try again." };
   }
 }
+
+
+export const GetRecommendations = async(userId)=>{
+  try {
+    const response = await axios.get(`${authRoute}recommend/${userId}`,{withCredentials:true});
+
+    if(!response.data.success) return { error: response.data.message || "reset failed." };
+
+    return { success: true, products:response.data.recommendations };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}

@@ -2,6 +2,7 @@ import {Customer} from "../database/Database.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
 import { validateLogin, validateNewPassWord, validateRegistration } from "../validators/customerValidator.js";
+import client from "../grpcClient.js";
 
 export const customerRegister = async (req, res, next) => {
     log.info("Register customer endpoint hit...");
@@ -348,6 +349,29 @@ export const customerOrders = async(req,res,next)=>{
 
     } catch (error) {
         log.error("Error fetching orders:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+}
+
+export const recommendProducts = async(req,res,next)=>{
+    log.info("recommend product end point hit...");
+    try {
+
+        const { userId } = req.params;
+        const customer = await Customer.findById(userId);
+        const wishlistProductIds = customer.wishlist.map((item) => item.productId.toString());
+
+        client.GetRecommendations({ productIds: wishlistProductIds }, (err, response) => {
+            if (err) {
+            console.error("gRPC error:", err);
+            return res.status(500).json({ message: "Failed to get recommendations" });
+            }
+
+            res.json({success:true, recommendations: response.recommendedProductIds });
+        });
+
+    } catch (error) {
+        log.error("Error in recommending products:", error);
         return next(new ApiError("Internal Server Error", 500));
     }
 }

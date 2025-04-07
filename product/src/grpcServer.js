@@ -1,32 +1,62 @@
+import mongoose from "mongoose";
 import grpc from "@grpc/grpc-js";
 import protoLoader from "@grpc/proto-loader";
-import path from "path";
+import Product from "./database/models/Product.model.js"; // Make sure path ends with .js if using ES modules
 
 // Load the .proto file
-const PROTO_PATH = path.join(__dirname, "protos", "recommendation.proto");
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const recommendationProto = grpc.loadPackageDefinition(packageDefinition).recommendation;
+const packageDef = protoLoader.loadSync("./protos/recommendation.proto", {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+const grpcObject = grpc.loadPackageDefinition(packageDef);
+const recommendationPackage = grpcObject.recommendation;
 
-// Sample product data
-const products = [
-  { id: "1", name: "Product A", imageUrl: "url1", price: 100 },
-  { id: "2", name: "Product B", imageUrl: "url2", price: 200 },
-  { id: "3", name: "Product C", imageUrl: "url3", price: 300 },
-];
+// gRPC handler function
+async function GetRecommendations(call, callback) {
+  try {
+    const { productIds } = call.request;
 
-// Implement the gRPC method
-function GetRecommendations(call, callback) {
-  console.log(`Received request from user ${call.request.userId}`);
+    const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(String(id)));
 
-  // Send some dummy recommended products
-  callback(null, { products });
+    const wishlistProducts = await Product.find({ _id: { $in: objectIds } });
+
+    const allTags = wishlistProducts.flatMap((p) => p.tags);
+    const categories = wishlistProducts.map((p) => p.category);
+    const brands = wishlistProducts.map((p) => p.brand);
+
+    const recommended = await Product.find({
+      $or: [
+        { tags: { $in: allTags } },
+        { category: { $in: categories } },
+        { brand: { $in: brands } },
+      ],
+      _id: { $nin: objectIds },
+    }).limit(10);
+
+    const formatted = recommended.map((prod) => ({
+      id: prod._id.toString(),
+      name: prod.name,
+      imageUrl: prod.imageUrl,
+      price: prod.price,
+    }));
+
+    callback(null, { products: formatted });
+  } catch (err) {
+    console.error("gRPC Error:", err);
+    callback(err);
+  }
 }
 
 // Start the gRPC server
 function startServer() {
   const server = new grpc.Server();
-  server.addService(recommendationProto.RecommendationService.service, { GetRecommendations });
-  
+  server.addService(recommendationPackage.RecommendationService.service, {
+    GetRecommendations, 
+  });
+
   const PORT = "50051";
   server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), () => {
     console.log(`✅ gRPC Server running on port ${PORT}`);
