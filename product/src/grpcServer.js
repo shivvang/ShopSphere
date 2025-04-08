@@ -1,10 +1,19 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import mongoose from "mongoose";
 import grpc from "@grpc/grpc-js";
 import protoLoader from "@grpc/proto-loader";
-import Product from "./database/models/Product.model.js"; // Make sure path ends with .js if using ES modules
+import Product from "./database/models/Product.model.js";
+import connectDb from './database/connect.js';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROTO_PATH = path.resolve(__dirname, '../../protos/recommendation.proto');
 
 // Load the .proto file
-const packageDef = protoLoader.loadSync("./protos/recommendation.proto", {
+const packageDef = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
   longs: String,
   enums: String,
@@ -17,6 +26,8 @@ const recommendationPackage = grpcObject.recommendation;
 // gRPC handler function
 async function GetRecommendations(call, callback) {
   try {
+    console.log("📞 gRPC: GetRecommendations hit!");
+
     const { productIds } = call.request;
 
     const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(String(id)));
@@ -58,10 +69,15 @@ function startServer() {
   });
 
   const PORT = "50051";
-  server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), () => {
-    console.log(`✅ gRPC Server running on port ${PORT}`);
-    server.start();
+  server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (err, port) => {
+    if (err) {
+      console.error("❌ Failed to bind gRPC server:", err);
+      return;
+    }
+    console.log(`✅ gRPC Server running on port ${port}`);
   });
 }
 
-startServer();
+connectDb().then(()=>{
+  startServer();
+});

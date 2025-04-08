@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
+    "start:grpc": "node src/grpcServer.js",
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
@@ -32,6 +33,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "nodemon": "^3.1.9"
   }
 }

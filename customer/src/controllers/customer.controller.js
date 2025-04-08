@@ -2,7 +2,7 @@ import {Customer} from "../database/Database.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
 import { validateLogin, validateNewPassWord, validateRegistration } from "../validators/customerValidator.js";
-import client from "../grpcClient.js";
+import grpcClient from "../grpcClient.js";
 
 export const customerRegister = async (req, res, next) => {
     log.info("Register customer endpoint hit...");
@@ -361,13 +361,13 @@ export const recommendProducts = async(req,res,next)=>{
         const customer = await Customer.findById(userId);
         const wishlistProductIds = customer.wishlist.map((item) => item.productId.toString());
 
-        client.GetRecommendations({ productIds: wishlistProductIds }, (err, response) => {
+        grpcClient.GetRecommendations({ productIds: wishlistProductIds }, (err, response) => {
             if (err) {
             console.error("gRPC error:", err);
             return res.status(500).json({ message: "Failed to get recommendations" });
             }
 
-            res.json({success:true, recommendations: response.recommendedProductIds });
+            res.json({success:true, recommendations: response.products  });
         });
 
     } catch (error) {

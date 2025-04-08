@@ -14,7 +14,7 @@ function Home() {
       console.log("im calling for recommendation");
       const response = await GetRecommendations(currentCustomer.id);
       if(response.success){
-        console.log(response.products);
+        console.log("oh i got recommendation",response.products);
       }
     }
 
