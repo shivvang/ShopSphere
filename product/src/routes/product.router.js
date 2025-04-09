@@ -1,5 +1,5 @@
 import express from "express";
-import { createProduct,deleteProduct,uploadFileAndGetUrl,searchProducts, updateProduct, removeImageFromAWS, getLatestProducts } from "../controllers/product.controller.js";
+import { createProduct,deleteProduct,uploadFileAndGetUrl,searchProducts, updateProduct, removeImageFromAWS, getLatestProducts, getRandomProducts, flashSaleProducts } from "../controllers/product.controller.js";
 const productRouter = express.Router();
 import verifyAccessTokenMiddleware from "../middleware/verifyAccessToken.js";
 import { upload } from "../middleware/multer.middleware.js";
@@ -12,6 +12,8 @@ import { upload } from "../middleware/multer.middleware.js";
 productRouter.post("/createProduct",verifyAccessTokenMiddleware,createProduct);
 productRouter.post("/searchProducts",searchProducts);
 productRouter.get("/latestProducts", getLatestProducts);
+productRouter.get("/randomProducts/:noOfProduct", getRandomProducts);
+productRouter.get("/DiscountedProducts", flashSaleProducts);
 productRouter.post("/file/upload",upload.single("file"),verifyAccessTokenMiddleware,uploadFileAndGetUrl);
 productRouter.put("/updateProduct/:productId", verifyAccessTokenMiddleware,updateProduct);
 productRouter.delete("/deleteProduct/:productId",verifyAccessTokenMiddleware,deleteProduct);

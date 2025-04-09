@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-function ListOfProduct({ products }) {
+function ListOfProduct({ products=[] }) {
   return (
     <div className="mt-12 px-4 md:px-10 lg:px-20">
       <div className="p-6 bg-[#1a1a1a] rounded-xl shadow-md">
@@ -12,7 +12,7 @@ function ListOfProduct({ products }) {
         <div className="flex gap-4 overflow-x-auto overflow-y-hidden whitespace-nowrap snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800 -webkit-overflow-scrolling-touch">
           {products.map((product) => (
             <div
-              key={product._id}
+              key={product.id}
               className="bg-[#121212] border border-gray-700 p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
             >
               {/* ✅ Image Handling */}

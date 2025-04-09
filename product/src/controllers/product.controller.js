@@ -218,11 +218,13 @@ export const getLatestProducts = async(req,res,next)=>{
 }
 
 export const flashSaleProducts =async(req,res,next)=>{
+  log.info("Get flash Sale products endpoint hit...");
   try {
-
-      const products = await Product.find({ discount: { $gte: 30 } })
+      const products = await Product.find({ discount: { $gte: 20 } })
       .sort({ discount: -1 }) 
       .limit(10);
+
+      
 
     return res.status(200).json({
       success: true,

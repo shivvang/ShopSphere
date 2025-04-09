@@ -33,10 +33,31 @@ export const searchProducts = async({searchQuery,category,brand,discount,price,r
     }
 }
 
-export const getRandomProducts = async(noOfProduct = 5)=>{
+export const getRandomProducts = async(noOfProduct = 10)=>{
   try {
     
     const response = await axios.get(`${productRoute}/randomProducts/${noOfProduct}`,{withCredentials:true});
+
+    if (!response.data.success) return { error: response.data.message || "fetch failed." };
+
+    return { success: true, message: "Successfully fetched.",products: response.data.products };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const getDiscountedProducts = async()=>{
+  try {
+    
+    const response = await axios.get(`${productRoute}/DiscountedProducts`,{withCredentials:true});
 
     if (!response.data.success) return { error: response.data.message || "fetch failed." };
 
