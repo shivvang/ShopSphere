@@ -1,5 +1,5 @@
 import express from "express";
-import { customerCart, customerLogin, customerLogout, customerOrders, customerRegister, customerWishlist, deleteCustomer, recommendProducts, resetPassword, resetToken } from "../controllers/customer.controller.js";
+import { customerCart, customerLogin, customerLogout, customerOrders, customerRegister, customerWishlist, deleteCustomer, recommendedOrders, recommendProducts, resetPassword, resetToken } from "../controllers/customer.controller.js";
 import verifyRefreshTokenMiddleware from "../middleware/verifyRefreshToken.js";
 import validatetoken from "../middleware/authenticateUser.js";
 
@@ -23,4 +23,5 @@ customerRouter.get("/orders", validatetoken,customerOrders);
 
 //recommendation
 customerRouter.get("/recommend/:userId",recommendProducts);
+customerRouter.get("/orderedRecommend/:userId",recommendedOrders);
 export default customerRouter;

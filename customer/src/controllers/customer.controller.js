@@ -375,3 +375,25 @@ export const recommendProducts = async(req,res,next)=>{
         return next(new ApiError("Internal Server Error", 500));
     }
 }
+
+export const recommendedOrders = async(req,res,next)=>{
+    log.info("recommend Order's end point hit...");
+    try {
+        const { userId } = req.params;
+        const customer = await Customer.findById(userId);
+        const orderProductIds = customer.orders.map((item) => item.productId.toString());
+
+        grpcClient.GetOrderBasedRecommendations({ productIds: orderProductIds }, (err, response) => {
+            if (err) {
+            console.error("gRPC error:", err);
+            return res.status(500).json({ message: "Failed to get recommendations" });
+            }
+
+            res.json({success:true, recommendations: response.products });
+        });
+
+    } catch (error) {
+        log.error("Error in recommending Ordered products:", error);
+        return next(new ApiError("Internal Server Error", 500));
+    }
+}

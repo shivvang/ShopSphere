@@ -38,7 +38,9 @@ async function GetRecommendations(call, callback) {
     const categories = wishlistProducts.map((p) => p.category);
     const brands = wishlistProducts.map((p) => p.brand);
 
-    const recommended = await Product.find({
+    let recommended;
+
+    recommended = await Product.find({
       $or: [
         { tags: { $in: allTags } },
         { category: { $in: categories } },
@@ -46,6 +48,13 @@ async function GetRecommendations(call, callback) {
       ],
       _id: { $nin: objectIds },
     }).limit(10);
+
+    //if no recommendation then random
+    if(recommended.length === 0){
+      recommended = await Product.aggregate([
+        { $sample: { size: 10 } },
+      ]);
+    }
 
     const formatted = recommended.map((prod) => ({
       id: prod._id.toString(),
@@ -61,11 +70,60 @@ async function GetRecommendations(call, callback) {
   }
 }
 
+
+async function GetOrderBasedRecommendations(call,callback){
+  try {
+    console.log("📞 gRPC: GetOrderBasedRecommendations hit!");
+
+    const { productIds } = call.request;
+
+    const objectIds = productIds.map((id) => new mongoose.Types.ObjectId(String(id)));
+
+    const orderedProducts = await Product.find({ _id: { $in: objectIds } });
+
+    const allTags = orderedProducts.flatMap((p) => p.tags);
+    const categories = orderedProducts.map((p) => p.category);
+    const brands = orderedProducts.map((p) => p.brand);
+
+    let recommended;
+
+     recommended = await Product.find({
+      $or: [
+        { tags: { $in: allTags } },
+        { category: { $in: categories } },
+        { brand: { $in: brands } },
+      ],
+      _id: { $nin: objectIds },
+    }).limit(10);
+
+    //if no recommendation then random
+    if(recommended.length === 0){
+      recommended = await Product.aggregate([
+        { $sample: { size: 10 } },
+      ]);
+    }
+    
+    const formatted = recommended.map((prod) => ({
+      id: prod._id.toString(),
+      name: prod.name,
+      imageUrl: prod.imageUrl,
+      price: prod.price,
+    }));
+
+    callback(null, { products: formatted });
+
+  } catch (error) {
+    console.error("gRPC Error:", error);
+    callback(err);
+  }
+}
+
 // Start the gRPC server
 function startServer() {
   const server = new grpc.Server();
   server.addService(recommendationPackage.RecommendationService.service, {
     GetRecommendations, 
+    GetOrderBasedRecommendations
   });
 
   const PORT = "50051";

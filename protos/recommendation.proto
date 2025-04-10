@@ -2,12 +2,17 @@ syntax = "proto3";
 
 package recommendation;
 
-// Define the service
 service RecommendationService {
   rpc GetRecommendations (RecommendationRequest) returns (RecommendationResponse);
+  rpc GetOrderBasedRecommendations (OrderRequest) returns (RecommendationResponse);
 }
 
-// Request structure
+message OrderRequest{
+  repeated string productIds = 1;
+}
+
+
+// Request structure for wishlist recommendation
 message RecommendationRequest {
   repeated string productIds = 1; // Array of product IDs from  User wishlist
 }

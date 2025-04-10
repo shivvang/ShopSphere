@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import Carousel from "./Carousel";
 import Category from "./Category";
@@ -20,6 +19,7 @@ function MainContent() {
   const [suggestedProducts,setSuggestedProducts] = useState([]);
   const [randomProducts ,setRandomProducts] = useState([]);
   const [discountedProducts ,setDiscountedProducts] = useState([]);
+  const [recommendedOrderedProducts ,setRecommendedOrderedProducts] = useState([]);
 
   useEffect(() => {
     const fetchLatestProducts = async () => {
@@ -49,6 +49,20 @@ function MainContent() {
         toast.error("Something went wrong while fetching recommendations");
       }
     };
+
+    const fetchOrderedRecommendation = async () => {
+      try {
+        const response = await GetRecommendations(currentCustomer.id);
+        if (response.success) {
+          setRecommendedOrderedProducts(response.products);
+        } else {
+          toast.error(response.message || "Failed to fetch recommendations");
+        }
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        toast.error("Something went wrong while fetching recommendations");
+      }
+    };
   
     const fetchRandoms = async () => {
       try {
@@ -69,6 +83,7 @@ function MainContent() {
         const response = await getDiscountedProducts();
         if (response.success) {
           setDiscountedProducts(response.products);
+          console.log("and whats going on overwhere",response.products);
         } else {
           toast.error(response.message || "Failed to fetch random products");
         }
@@ -84,6 +99,7 @@ function MainContent() {
       await Promise.all([
         fetchLatestProducts(),
         fetchRecommendation(),
+        fetchOrderedRecommendation(),
         fetchRandoms(),
         fetchDiscounted(),
       ]);
@@ -96,8 +112,12 @@ function MainContent() {
 
   return (
     <>
-    {isLoading && <Spinner/>}
-    <div className="min-h-screen w-full bg-gradient-to-br from-black to-[#1a1a1a] text-white">
+    {isLoading ? (
+    <div className="min-h-screen w-full flex items-center justify-center bg-black text-white">
+    <Spinner/>
+    </div>
+    ):(
+      <div className="min-h-screen w-full bg-gradient-to-br from-black to-[#1a1a1a] text-white">
       {/* ✅ Hero Section */}
       <div className="text-center py-16 px-4">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
@@ -156,8 +176,8 @@ function MainContent() {
         <div className="md:col-span-3 row-span-1 bg-[#121212] p-6 rounded-lg shadow-md hover:scale-105 transition-transform">
           <h2 className="text-xl font-semibold mb-2">🚀 Frequently Bought Together</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-            {latestProducts.slice(4, 8).map((product) => (
-              <div key={product._id} className="flex-shrink-0 w-32">
+            {recommendedOrderedProducts.slice(4, 8).map((product) => (
+              <div key={product.id} className="flex-shrink-0 w-32">
                 {!product.imageUrl ? (
                   <div className="animate-pulse bg-gray-800 h-28 w-full rounded-lg"></div>
                 ) : (
@@ -168,14 +188,9 @@ function MainContent() {
                   />
                 )}
                 <div className="mt-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#FF6F00] font-semibold text-sm">
-                      ₹{(product.price * (1 - product.discount / 100)).toFixed(2)}
-                    </span>
-                    <span className="text-gray-400 text-xs line-through">
-                      ₹{product.price}
-                    </span>
-                  </div>
+                  <span className="text-gray-400 text-xs">
+                    ₹{product.price}
+                  </span>
                   <span className="text-gray-400 truncate block text-xs">
                     {product.name}
                   </span>
@@ -215,7 +230,7 @@ function MainContent() {
         <div className="p-6 bg-[#1a1a1a] rounded-xl shadow-md">
           <h2 className="text-2xl font-semibold mb-4">🔥 Discounted Deals </h2>
           <div className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800 snap-x snap-mandatory">
-            {discountedProducts.slice(0, 8).map((product) => (
+            {discountedProducts.length > 0 ? (discountedProducts.map((product) => (
               <div
                 key={product._id}
                 className="bg-[#121212] border border-gray-700 p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
@@ -254,13 +269,22 @@ function MainContent() {
                   Add to Cart
                 </button>
               </div>
-            ))}
+            ))):(
+              <div className="flex flex-col items-center justify-center w-full py-10 text-center text-gray-400">
+                <div className="text-4xl mb-4 animate-bounce">🛍️</div>
+                <h3 className="text-xl font-semibold mb-1">No Deals Right Now</h3>
+                <p className="text-sm max-w-md">
+                  We’re freshening up the discounts! Check back soon for exciting offers and hot deals. 🔥
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+    )}
     </>
-  );
+  )
 }
 
 export default MainContent;
