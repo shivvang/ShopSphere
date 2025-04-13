@@ -28,4 +28,5 @@ message Product {
   string name = 2;
   string imageUrl = 3;
   float price = 4;
+  string brand = 5;
 }

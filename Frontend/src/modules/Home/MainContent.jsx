@@ -41,6 +41,7 @@ function MainContent() {
         const response = await GetRecommendations(currentCustomer.id);
         if (response.success) {
           setSuggestedProducts(response.products);
+          console.log("and whats going on overwhere at wishlist",response.products);
         } else {
           toast.error(response.message || "Failed to fetch recommendations");
         }
@@ -55,6 +56,7 @@ function MainContent() {
         const response = await GetRecommendations(currentCustomer.id);
         if (response.success) {
           setRecommendedOrderedProducts(response.products);
+          console.log("and whats going on overwhere at orders",response.products);
         } else {
           toast.error(response.message || "Failed to fetch recommendations");
         }
@@ -83,7 +85,6 @@ function MainContent() {
         const response = await getDiscountedProducts();
         if (response.success) {
           setDiscountedProducts(response.products);
-          console.log("and whats going on overwhere",response.products);
         } else {
           toast.error(response.message || "Failed to fetch random products");
         }
@@ -148,26 +149,27 @@ function MainContent() {
           <h2 className="text-xl font-semibold mb-2">🛒 New Arrivals</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
             {latestProducts.slice(0, 4).map((product) => (
-              <div key={product._id} className="flex-shrink-0 w-32">
-                {!product.imageUrl ? (
-                  <div className="animate-pulse bg-gray-800 h-28 w-full rounded-lg"></div>
-                ) : (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-28 object-cover rounded-lg"
-                  />
-                )}
-                <p className="text-white text-sm font-semibold mt-1">
-                  ₹ {product.price}
-                </p>
-                <span className="text-gray-400 truncate block text-xs">
-                  {product.name}
-                </span>
-                <span className="text-[#FF6F00] text-sm font-bold uppercase tracking-wide shadow-md">
-                  {product.brand}
-                </span>
+              <div key={product._id} className="flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2">
+              {!product.imageUrl ? (
+                <div className="animate-pulse bg-gray-700 h-32 w-full rounded-lg"></div>
+              ) : (
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+              )}
+
+              <div className="mt-3 space-y-1">
+                <p className="text-sm font-medium text-white truncate">{product.name}</p>
+                <p className="text-xs text-gray-400 truncate">Brand: {product.brand}</p>
+                <p className="text-sm text-[#FFB74D] font-semibold">₹ {product.price}</p>
+
+                <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200">
+                  Add to Wishlist
+                </button>
               </div>
+            </div>
             ))}
           </div>
         </div>
@@ -177,27 +179,25 @@ function MainContent() {
           <h2 className="text-xl font-semibold mb-2">🚀 Frequently Bought Together</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
             {recommendedOrderedProducts.slice(4, 8).map((product) => (
-              <div key={product.id} className="flex-shrink-0 w-32">
+              <div key={product.id} className="overflow-y-hidden flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2">
                 {!product.imageUrl ? (
-                  <div className="animate-pulse bg-gray-800 h-28 w-full rounded-lg"></div>
+                  <div className="animate-pulse bg-gray-700 h-32 w-full rounded-lg"></div>
                 ) : (
                   <img
                     src={product.imageUrl}
                     alt={product.name}
-                    className="w-full h-28 object-cover rounded-lg"
+                    className="w-full h-32 object-cover rounded-lg"
                   />
                 )}
-                <div className="mt-1">
-                  <span className="text-gray-400 text-xs">
-                    ₹{product.price}
-                  </span>
-                  <span className="text-gray-400 truncate block text-xs">
-                    {product.name}
-                  </span>
-                  <span className="text-[#FF6F00] text-sm font-bold uppercase tracking-wide shadow-md">
-                    {product.brand}
-                  </span>
-                </div>
+                <div className="mt-3 space-y-1">
+                  <p className="text-sm font-medium text-white truncate">{product.name}</p>
+                  <p className="text-xs text-gray-400 truncate">Brand: {product.brand}</p>
+                  <p className="text-sm text-[#FFB74D] font-semibold">₹{product.price}</p>
+
+                  <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200">
+                    Add to Cart
+                  </button>
+                </div> 
               </div>
             ))}
           </div>

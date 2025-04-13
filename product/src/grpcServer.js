@@ -61,6 +61,7 @@ async function GetRecommendations(call, callback) {
       name: prod.name,
       imageUrl: prod.imageUrl,
       price: prod.price,
+      brand: prod.brand,
     }));
 
     callback(null, { products: formatted });
@@ -108,6 +109,7 @@ async function GetOrderBasedRecommendations(call,callback){
       name: prod.name,
       imageUrl: prod.imageUrl,
       price: prod.price,
+      brand: prod.brand,
     }));
 
     callback(null, { products: formatted });

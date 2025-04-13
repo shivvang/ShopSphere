@@ -36,9 +36,7 @@ function ListOfProduct({ products=[] }) {
                 <span className="text-gray-400 truncate block">
                   {product.name}
                 </span>
-                <span  className="text-[#FF6F00] text-sm font-bold uppercase tracking-wide shadow-md">
-                  {product.brand}
-                </span>
+                <p className="text-xs text-gray-400 truncate">Brand: {product.brand}</p>
               </div>
 
               {/* ✅ Wishlist Button */}
