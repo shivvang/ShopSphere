@@ -14,7 +14,7 @@ function Carousel({ products }) {
   }, [products]);
 
   return (
-    <div className="w-full h-[30vh] sm:h-[40vh] md:h-[50vh] lg:h-[60vh] relative overflow-hidden rounded-[24px]">
+    <div className="w-full h-[30vh] sm:h-[40vh] md:h-[50vh] lg:h-[60vh]  border-4 border-[#FF6F00] relative overflow-hidden rounded-[24px]">
     {products.map((product, i) => (
       <div 
         key={product._id} 

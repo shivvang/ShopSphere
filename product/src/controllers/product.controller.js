@@ -225,11 +225,7 @@ export const flashSaleProducts =async(req,res,next)=>{
   log.info("Get flash Sale products endpoint hit...");
   try {
 
-      const minDiscount = 20;
-      const maxDiscount = 70;
-      const randomDiscount = Math.floor(Math.random() * (maxDiscount - minDiscount + 1)) + minDiscount;
-
-      const products = await Product.find({ discount: { $gte: randomDiscount } })
+      const products = await Product.find({  discount: { $gte: 20, $lte: 70 } })
       .sort({ discount: -1 }) 
       .limit(10);
 

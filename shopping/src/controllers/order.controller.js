@@ -41,9 +41,10 @@ export const setOrder = async (req, res, next) => {
         const jobData = { userId, productId, priceAtPurchase, quantity };
 
        
-        const delay = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+        const delay = 60 * 1000; // 7 days in milliseconds
 
         log.info(`Adding new job for user ${userId}`);
+        
             await deliveryQueue.add("processOrder", jobData, {
                 jobId: productId.toString(),
                 delay, 

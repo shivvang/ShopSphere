@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-function ListOfProduct({ products=[] }) {
+function ListOfProduct({ products=[] ,handleAddToWishlist}) {
   return (
     <div className="mt-12 px-4 md:px-10 lg:px-20">
       <div className="p-6 bg-[#1a1a1a] rounded-xl shadow-md">
@@ -26,21 +26,20 @@ function ListOfProduct({ products=[] }) {
                 />
               )}
 
-              {/* ✅ Product Info */}
+            
               <div className="mt-2">
-                {/* ✅ Price */}
-                <p className="text-white font-semibold text-lg">
-                  ₹ {product.price}
-                </p>
-                {/* ✅ Name */}
-                <span className="text-gray-400 truncate block">
+                <span className="text-white font-medium truncate block">
                   {product.name}
                 </span>
-                <p className="text-xs text-gray-400 truncate">Brand: {product.brand}</p>
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-wide shadow-md">{product.brand}</p>
+                <p className="text-[#FFB74D]  font-semibold text-lg">
+                  ₹ {product.price}
+                </p>
               </div>
 
               {/* ✅ Wishlist Button */}
-              <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all">
+              <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all"
+              onClick={()=>{handleAddToWishlist(product.id,product.name,product.imageUrl,product.price)}}>
                 Add to Wishlist
               </button>
             </div>

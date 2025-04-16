@@ -1,5 +1,6 @@
 import {createServer} from "http";
 import {Server } from "socket.io"
+import log from "../utils/logHandler.js";
 
 const httpServer = createServer();
 const PORT = process.env.SOCKET_PORT || 3000;

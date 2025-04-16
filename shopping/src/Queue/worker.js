@@ -1,12 +1,17 @@
 import {Worker} from "bullmq"
-import log from "../utils/logHandler"
+import log from "../utils/logHandler.js"; 
 import io from "../Socket/Socket.js";
 import Order from "../database/models/Order.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { publishEventToExchange } from "./rabbitmq.js";
+import connectDb from "../database/connect.js";
+
+await connectDb();
+
+log.info("🔥 Delivery Worker started and ready to process jobs...");
 
 const deliveryWorker = new Worker(
-    "processOrder",
+    "DeliveryQueue",
     async (job) => {
         const { userId, productId, priceAtPurchase, quantity } = job.data;
 

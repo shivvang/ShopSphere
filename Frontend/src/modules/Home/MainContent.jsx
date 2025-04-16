@@ -3,10 +3,14 @@ import Carousel from "./Carousel";
 import Category from "./Category";
 import ListOfProduct from "./ListOfProduct";
 import { getDiscountedProducts, getLatestProducts, getRandomProducts } from "../../services/useProduct";
-import { GetRecommendations } from "../../services/useAuth";
+import { GetOrderedRecommendations, GetRecommendations } from "../../services/useAuth";
 import toast from "react-hot-toast";
 import {useSelector} from "react-redux";
 import Spinner from "../common/Spinner";
+import { addToCart, addToWishlist } from "../../services/useShopping";
+import Lottie from "lottie-react";
+import animationJson from "../../assets/Animation - 1744810780956.json";
+
 
 function MainContent() {
 
@@ -22,6 +26,9 @@ function MainContent() {
   const [recommendedOrderedProducts ,setRecommendedOrderedProducts] = useState([]);
 
   useEffect(() => {
+
+    if (!currentCustomer || !currentCustomer.id) return;
+
     const fetchLatestProducts = async () => {
       try {
         const data = await getLatestProducts();
@@ -41,7 +48,6 @@ function MainContent() {
         const response = await GetRecommendations(currentCustomer.id);
         if (response.success) {
           setSuggestedProducts(response.products);
-          console.log("and whats going on overwhere at wishlist",response.products);
         } else {
           toast.error(response.message || "Failed to fetch recommendations");
         }
@@ -53,10 +59,9 @@ function MainContent() {
 
     const fetchOrderedRecommendation = async () => {
       try {
-        const response = await GetRecommendations(currentCustomer.id);
+        const response = await GetOrderedRecommendations(currentCustomer.id);
         if (response.success) {
           setRecommendedOrderedProducts(response.products);
-          console.log("and whats going on overwhere at orders",response.products);
         } else {
           toast.error(response.message || "Failed to fetch recommendations");
         }
@@ -111,6 +116,28 @@ function MainContent() {
     fetchAllData(); // trigger the parallel calls
   }, []);
 
+  const handleAddToWishlist = async(productId,name,imageUrl,price)=>{
+
+      const response = await addToWishlist(productId,name,imageUrl,price);
+
+      if(response.success){
+        toast.success("successfully added to wishlist");
+      }else{
+        toast.error(response.error);
+      }
+  }
+
+  const handleAddToCart = async(productId,name,imageUrl,price)=>{
+
+    const response = await addToCart(productId,name,imageUrl,price);
+
+    if(response.success){
+      toast.success("successfully added to Cart");
+    }else{
+      toast.error(response.error);
+    }
+  }
+
   return (
     <>
     {isLoading ? (
@@ -141,11 +168,16 @@ function MainContent() {
 
         {/* ✅ Category Section */}
         <div className="md:col-span-3 md:row-span-1">
+          <div className="bg-[#1f1f1f] p-6 rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-white border-b border-gray-700 pb-2">
+            Explore Featured Categories
+          </h2>
           <Category />
+          </div>
         </div>
 
         {/* ✅ New Arrivals */}
-        <div className="md:col-span-3 row-span-1 bg-[#121212] p-6 rounded-lg shadow-md hover:scale-105 transition-transform">
+        <div className="md:col-span-3 row-span-1 border-4 border-[#FF6F00] bg-[#121212] p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">🛒 New Arrivals</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
             {latestProducts.slice(0, 4).map((product) => (
@@ -160,12 +192,15 @@ function MainContent() {
                 />
               )}
 
+              
+
               <div className="mt-3 space-y-1">
                 <p className="text-sm font-medium text-white truncate">{product.name}</p>
-                <p className="text-xs text-gray-400 truncate">Brand: {product.brand}</p>
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-wide shadow-md">{product.brand}</p>
                 <p className="text-sm text-[#FFB74D] font-semibold">₹ {product.price}</p>
 
-                <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200">
+                <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200"
+                onClick={()=>{handleAddToWishlist(product._id,product.name,product.imageUrl,product.price)}}>
                   Add to Wishlist
                 </button>
               </div>
@@ -175,7 +210,7 @@ function MainContent() {
         </div>
 
         {/*Frequently Bought together */}
-        <div className="md:col-span-3 row-span-1 bg-[#121212] p-6 rounded-lg shadow-md hover:scale-105 transition-transform">
+        <div className="md:col-span-3 row-span-1 bg-[#121212] p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">🚀 Frequently Bought Together</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
             {recommendedOrderedProducts.slice(4, 8).map((product) => (
@@ -191,10 +226,11 @@ function MainContent() {
                 )}
                 <div className="mt-3 space-y-1">
                   <p className="text-sm font-medium text-white truncate">{product.name}</p>
-                  <p className="text-xs text-gray-400 truncate">Brand: {product.brand}</p>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wide shadow-md">{product.brand}</p>
                   <p className="text-sm text-[#FFB74D] font-semibold">₹{product.price}</p>
 
-                  <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200">
+                  <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200"
+                  onClick={()=>handleAddToCart(product.id,product.name,product.imageUrl,product.price)}>
                     Add to Cart
                   </button>
                 </div> 
@@ -205,23 +241,17 @@ function MainContent() {
 
         {/* ✅ List of Products */}
         <div className="md:col-span-9 row-span-2">
-          <ListOfProduct  products={suggestedProducts}/>
+          <ListOfProduct  products={suggestedProducts} handleAddToWishlist={handleAddToWishlist}/>
         </div>
 
-        {/* ✅ Updated Text Section */}
-        <div className="md:col-span-3 row-span-1">
-        <p className="leading-snug text-white font-medium space-y-1">
-          <span className="text-[#f39c12] text-xl font-semibold">Welcome</span>
-          <span className="text-sm ml-1">to your ultimate shopping destination.</span>
-          <span className="text-[#e67e22] text-xs ml-1">Discover</span>
-          <span className="text-sm ml-1">exclusive deals and top-rated products.</span>
-          <span className="text-[#e74c3c] text-2xl font-bold block mt-2">Explore</span>
-          <span className="text-[#ecf0f1] text-sm ml-1">our curated collections.</span>
-          <span className="text-[#f39c12] text-lg font-semibold block mt-2">Uncover</span>
-          <span className="text-[#bdc3c7] text-xs ml-1">hidden treasures and unique finds.</span>
-          <span className="text-[#ecf0f1] text-[0.65rem] ml-1">Shop Now</span>
-          <span className="text-sm ml-1">for the latest trends and savings!</span>
-        </p>
+       
+        <div className="md:col-span-3 row-span-1 border-6 border-[#FF6F00] rounded-xl overflow-hidden shadow-lg flex items-center justify-center bg-gray-900 p-4">
+          <Lottie
+            animationData={animationJson}
+            loop
+            autoplay
+            className="w-full max-w-[400px] h-auto"
+          />
         </div>
       </div>
 
@@ -233,7 +263,7 @@ function MainContent() {
             {discountedProducts.length > 0 ? (discountedProducts.map((product) => (
               <div
                 key={product._id}
-                className="bg-[#121212] border border-gray-700 p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
+                className="bg-[#121212] border-2 border-[#FF6F00] p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
               >
                 {!product.imageUrl ? (
                   <div className="animate-pulse bg-gray-800 h-40 w-full rounded-lg"></div>
@@ -265,7 +295,8 @@ function MainContent() {
                     {product.brand}
                   </span>
                 </div>
-                <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all">
+                <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all"
+                onClick={()=>handleAddToCart(product._id,product.name,product.imageUrl,product.price)}>
                   Add to Cart
                 </button>
               </div>
