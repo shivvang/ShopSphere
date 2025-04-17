@@ -85,7 +85,7 @@ app.use("/v1/customers",proxy(process.env.CUSTOMER_SERVICE_URL,{
     }
 }))
 
-app.use("/v1/addresses",proxy(process.env.CUSTOMER_SERVICE_URL,{
+app.use("/v1/notifications",proxy(process.env.CUSTOMER_SERVICE_URL,{
     ...proxyOptions,
     proxyReqOptDecorator:(proxyReqOpts,srcReq)=>{
         proxyReqOpts.headers["Content-Type"] = "application/json"

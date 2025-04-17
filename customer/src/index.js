@@ -6,12 +6,13 @@ import { PORT } from "./config/config.js";
 import log from "./utils/logHandler.js";
 import connectDb from "./database/connect.js";
 import errorHandler from "./utils/errorHandler.js";
-import {customerRouter,addressRouter} from "./routes/router.js"
+import {customerRouter} from "./routes/router.js"
 import { consumeRabbitMQEvent, initializeRabbitMQ } from "./queue/rabbitmq.js";
 import { addWishlistToCustomer, clearWishlistToCustomer, deleteWishlistToCustomer } from "./eventHandlers/wishlist.eventHandler.js";
 import { addCartToCustomer, clearCartToCustomer, deleteCartToCustomer } from "./eventHandlers/cart.eventHandler.js";
 import { addOrderToCustomer, createOrderFromCheckout, deleteOrderToCustomer, processOrder } from "./eventHandlers/order.eventHandler.js";
 import { handleProductDeletion, handleProductUpdation } from "./eventHandlers/product.eventHandler.js";
+import notificationRouter from "./routes/notification.router.js";
 
 
 
@@ -34,7 +35,7 @@ app.use(cookieparser());
 app.use(errorHandler);
 
 app.use("/api/customers",customerRouter);
-app.use("/api/addresses",addressRouter);
+app.use("/api/notifications",notificationRouter);
 
 
 async function initializeCustomerService(){

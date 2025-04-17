@@ -53,7 +53,7 @@ export const setOrder = async (req, res, next) => {
             });    
         
 
-        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
+        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase,message: `Your order for product ${productId} has Arrived!` });
 
         log.info(`Order processing event published for order: ${order._id}`);
         return res.status(201).json({ success: true, message: "Order placed successfully", order });

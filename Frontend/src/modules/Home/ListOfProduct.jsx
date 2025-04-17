@@ -10,7 +10,17 @@ function ListOfProduct({ products=[] ,handleAddToWishlist}) {
 
         {/* ✅ Horizontally Scrollable Container */}
         <div className="flex gap-4 overflow-x-auto overflow-y-hidden whitespace-nowrap snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800 -webkit-overflow-scrolling-touch">
-          {products.map((product) => (
+          {products.length === 0 ? (
+            <div className="text-center px-6 py-10 bg-[#1a1a1a] rounded-lg shadow-inner border border-[#FF6F00]/20">
+              <p className="text-[#FF6F00] text-base font-semibold mb-1">
+              Wishlist is feeling lonely 🧡
+             </p>
+            <p className="text-sm text-white/70">
+              No recommended products based on your Wishlist yet.
+            </p>
+            </div>
+            ):(
+            products.map((product) => (
             <div
               key={product.id}
               className="bg-[#121212] border border-gray-700 p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
@@ -43,7 +53,8 @@ function ListOfProduct({ products=[] ,handleAddToWishlist}) {
                 Add to Wishlist
               </button>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
     </div>

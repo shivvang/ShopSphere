@@ -17,14 +17,6 @@ const customerSchema = new mongoose.Schema(
         type: String,
         unique: true,
       },
-      address: {
-        street: String,
-        postalCode: String,
-        city: String,
-        state: String,
-        country: String,
-        addressId:{ type:mongoose.Schema.Types.ObjectId, ref: "Address" },
-      },
       cart: [
         {
           productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },

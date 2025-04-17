@@ -151,3 +151,46 @@ export const GetOrderedRecommendations = async(userId)=>{
     return { error: "Something went wrong. Please try again." };
   }
 }
+
+const notificationRoute = "http://localhost:8000/v1/notifications";
+
+export const markAsRead = async(productId)=>{
+  try {
+    const response = await axios.get(`${notificationRoute}/read/${productId}`,{withCredentials:true});
+
+    if(!response.data.success) return { error: response.data.message || "Failed to Mark Notification As Read." };
+
+    return { success: true, message: response.data.message };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}
+
+export const findUnReadNotification = async(userId)=>{
+  try {
+
+    const response = await axios.get(`${notificationRoute}/unRead/${userId}`);
+
+    if(!response.data.success) return { error: response.data.message || "Failed to Fetch UnRead Notification." };
+
+    return { success: true, products:response.data.recommendations };
+
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        // Controlled backend errors 
+        return { error: error.response.data.message || "Request failed. Please try again." };
+      }
+    }
+    // Unexpected errors
+    return { error: "Something went wrong. Please try again." };
+  }
+}

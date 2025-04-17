@@ -1,3 +1,4 @@
+import { Notification } from "../database/Database.js";
 import Customer from "../database/models/customer.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import log from "../utils/logHandler.js"
@@ -73,7 +74,7 @@ export const processOrder = async (event) => {
     log.info(`Processing order event: ${JSON.stringify(event)}`);
 
     try {
-        const { userId, productId } = event;
+        const { userId, productId ,quantity,name, imageUrl, priceAtPurchase,message} = event;
 
         if (!userId || !productId) {
             log.warn("Missing required fields: userId or productId", { userId, productId });
@@ -96,6 +97,16 @@ export const processOrder = async (event) => {
 
         existingItem.status = "delivered";
         await customer.save();
+
+        //save product to notification db 
+        await Notification.create({
+            customerId:userId,
+            message,
+            imageUrl,
+            productId,
+            priceAtPurchase,
+            quantity,
+        })
 
         log.info(`Order for Product: ${productId} marked as delivered for User: ${userId}`);
 

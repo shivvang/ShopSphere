@@ -115,7 +115,7 @@ function MainContent() {
     };
   
     fetchAllData(); // trigger the parallel calls
-  }, []);
+  }, [currentCustomer]);
 
   const handleAddToWishlist = async(productId,name,imageUrl,price)=>{
 
@@ -181,7 +181,7 @@ function MainContent() {
         <div className="md:col-span-3 row-span-1 border-4 border-[#FF6F00] bg-[#121212] p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">🛒 New Arrivals</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-            {latestProducts.slice(0, 4).map((product) => (
+            {latestProducts.map((product) => (
               <div key={product._id} className="flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2">
               {!product.imageUrl ? (
                 <div className="animate-pulse bg-gray-700 h-32 w-full rounded-lg"></div>
@@ -214,7 +214,16 @@ function MainContent() {
         <div className="md:col-span-3 row-span-1 bg-[#121212] p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">🚀 Frequently Bought Together</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-            {recommendedOrderedProducts.map((product) => (
+            {recommendedOrderedProducts.length == 0 ? (
+              <div className="text-center px-6 py-10 bg-[#121212] rounded-lg shadow-inner border border-[#FF6F00]/20">
+              <p className="text-[#FFB74D] text-base font-semibold mb-1">
+                Nothing to see here yet 👀
+              </p>
+              <p className="text-sm text-white/70">
+              No recommended products based on your orders.
+              </p>
+            </div>
+            ):(recommendedOrderedProducts.map((product) => (
               <div key={product.id} className="overflow-y-hidden flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2">
                 {!product.imageUrl ? (
                   <div className="animate-pulse bg-gray-700 h-32 w-full rounded-lg"></div>
@@ -236,7 +245,8 @@ function MainContent() {
                   </button>
                 </div> 
               </div>
-            ))}
+            )))
+            }
           </div>
         </div>
 
