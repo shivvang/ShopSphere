@@ -38,10 +38,10 @@ export const setOrder = async (req, res, next) => {
         log.info(`Order saved for user ${userId} and product ${productId}.`);
 
        
-        const jobData = { userId, productId, priceAtPurchase, quantity };
+        const jobData = { userId, productId, priceAtPurchase, quantity,imageUrl };
 
        
-        const delay = 60 * 1000; // 7 days in milliseconds
+        const delay = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
         log.info(`Adding new job for user ${userId}`);
         

@@ -90,9 +90,19 @@ function OrderProduct({ order ,handleCancelOrder}) {
       >
         {order.status.toUpperCase()}
       </span>
-      <button onClick={()=>handleCancelOrder(order.productId)} className="bg-red-500 text-white px-4 py-2 rounded-lg mt-3 shadow-md hover:bg-red-600 transition duration-200">
-        Cancel Order
-      </button>
+      <button
+        disabled={order.status === "delivered"}
+        onClick={() => handleCancelOrder(order.productId)}
+        className={`
+          px-4 py-2 rounded-lg mt-3 shadow-md transition duration-200
+          ${order.status === "delivered"
+            ? 'bg-gray-400 text-gray-600 cursor-not-allowed hover:bg-gray-400' // Styles for delivered state
+            : 'bg-red-500 text-white hover:bg-red-600' // Default styles
+          }
+        `}
+      >
+     Cancel Order
+    </button>
     </div>
   );
 }

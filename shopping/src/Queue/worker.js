@@ -64,7 +64,7 @@ const deliveryWorker = new Worker(
 
 
 deliveryWorker.on("completed", (job) => {
-    const { userId, productId, priceAtPurchase, quantity } = job.data;
+    const { userId, productId, priceAtPurchase, quantity,imageUrl } = job.data;
 
     log.info(`Order processing completed for user ${userId}, product ${productId}`);
 
@@ -74,10 +74,11 @@ deliveryWorker.on("completed", (job) => {
     }
 
     io.to(userId).emit("deliveryUpdate", {
-        message: `Your order for product ${productId} has been delivered!`,
+        message: `Your order for product ${productId} has Arrived!`,
         productId,
         priceAtPurchase,
         quantity,
+        imageUrl
     });
 });
 

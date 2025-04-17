@@ -61,6 +61,7 @@ function MainContent() {
       try {
         const response = await GetOrderedRecommendations(currentCustomer.id);
         if (response.success) {
+          console.log(response.products);
           setRecommendedOrderedProducts(response.products);
         } else {
           toast.error(response.message || "Failed to fetch recommendations");
@@ -213,7 +214,7 @@ function MainContent() {
         <div className="md:col-span-3 row-span-1 bg-[#121212] p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">🚀 Frequently Bought Together</h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-            {recommendedOrderedProducts.slice(4, 8).map((product) => (
+            {recommendedOrderedProducts.map((product) => (
               <div key={product.id} className="overflow-y-hidden flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2">
                 {!product.imageUrl ? (
                   <div className="animate-pulse bg-gray-700 h-32 w-full rounded-lg"></div>

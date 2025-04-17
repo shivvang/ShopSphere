@@ -7,16 +7,16 @@ import Navbar from './modules/common/Navbar.jsx'
 import { useLocation } from "react-router-dom";
 import { useState } from 'react'
 import SellerRoute from './routes/SellerRoute.jsx'
-import { Provider } from 'react-redux'
-import { CustomerStore } from  "./redux/Customer/store.js"
 import PrivateRoute from './modules/common/PrivateRoute.jsx'
+import useDeliveryNotification from './SocketClient/useDeliveryNotification.jsx'
 
 function App() {
   const location = useLocation();
   const hideNavbar = location.pathname.startsWith("/auth") || location.pathname.startsWith("/seller");
   const [searchQuery,setSearchQuery] = useState("");
+  useDeliveryNotification(); 
   return (
-    <Provider store={CustomerStore}>
+  
       <div className="overflow-hidden flex flex-col h-screen">
     {!hideNavbar && <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>}  
     <div className="flex-grow overflow-y-auto overflow-x-hidden h-0">
@@ -32,7 +32,7 @@ function App() {
       </Routes>
     </div>
   </div>
- </Provider> 
+
   );
 }
 

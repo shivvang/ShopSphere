@@ -1,12 +1,20 @@
 import {createServer} from "http";
 import {Server } from "socket.io"
 import log from "../utils/logHandler.js";
+import express from "express";
 
-const httpServer = createServer();
+const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.SOCKET_PORT || 3000;
 
+
+
 const io = new Server(httpServer, {
-    cors: { origin: "*" } 
+    cors: { 
+        origin: "http://localhost:5173", 
+        methods: ["GET", "POST"],
+        credentials: true,
+    } 
 });
 
 httpServer.listen(PORT, () => {
