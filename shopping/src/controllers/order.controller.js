@@ -41,7 +41,7 @@ export const setOrder = async (req, res, next) => {
         const jobData = { userId, productId, priceAtPurchase, quantity,imageUrl };
 
        
-        const delay = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+        const delay = 60 * 1000; // 7 days in milliseconds
 
         log.info(`Adding new job for user ${userId}`);
         
@@ -53,7 +53,7 @@ export const setOrder = async (req, res, next) => {
             });    
         
 
-        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase,message: `Your order for product ${productId} has Arrived!` });
+        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
 
         log.info(`Order processing event published for order: ${order._id}`);
         return res.status(201).json({ success: true, message: "Order placed successfully", order });

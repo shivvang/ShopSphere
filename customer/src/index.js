@@ -26,6 +26,7 @@ app.use(express.json())
 const corsOptions = {
     origin: process.env.FRONTEND_URL,
     credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   };
   
 app.use(cors(corsOptions));

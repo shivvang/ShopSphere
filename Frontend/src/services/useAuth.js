@@ -156,8 +156,11 @@ const notificationRoute = "http://localhost:8000/v1/notifications";
 
 export const markAsRead = async(productId)=>{
   try {
-    const response = await axios.get(`${notificationRoute}/read/${productId}`,{withCredentials:true});
-
+   
+    const response = await axios.put(`${notificationRoute}/read/${productId}`,{},{
+      withCredentials: true,
+    });
+    
     if(!response.data.success) return { error: response.data.message || "Failed to Mark Notification As Read." };
 
     return { success: true, message: response.data.message };
@@ -181,7 +184,9 @@ export const findUnReadNotification = async(userId)=>{
 
     if(!response.data.success) return { error: response.data.message || "Failed to Fetch UnRead Notification." };
 
-    return { success: true, products:response.data.recommendations };
+    if(response.data.message) return { success: true, message:response.data.message };
+
+    return { success: true, notifications:response.data.unreadNotifications };
 
   } catch (error) {
     if (error.response) {

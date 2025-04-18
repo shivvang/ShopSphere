@@ -11,7 +11,7 @@ const validatetoken = async (req, res, next) => {
   
   const token = req.cookies?.accessToken; 
 
-  log.info("Validating user at api gateway before hitting sensitive endpoints");
+  log.info("Validating user before hitting sensitive endpoints");
 
   if (!token) {
     log.warn("User doesn't have an access token.");

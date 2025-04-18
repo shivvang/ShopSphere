@@ -4,7 +4,7 @@ import { fetchUnreadNotifications, markAsRead } from "../controllers/notificatio
 
 const notificationRouter = express.Router();
 
-notificationRouter.patch("/read/:productId",validatetoken,markAsRead)
+notificationRouter.put("/read/:productId",validatetoken,markAsRead)
 notificationRouter.get("/unRead/:userId", fetchUnreadNotifications)
 
 export default notificationRouter;

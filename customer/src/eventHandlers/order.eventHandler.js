@@ -6,7 +6,7 @@ import log from "../utils/logHandler.js"
 export const addOrderToCustomer = async(event)=>{
     log.info("Adding product to Order...", { event });
     try {
-        const { userId, productId, quantity,name, imageUrl, priceAtPurchase} = event;
+        const { userId, productId, quantity,name, imageUrl, priceAtPurchase,message} = event;
 
         if (!userId || !productId || !quantity) {
             log.error("Missing userId, productId, or quantity in request", { userId, productId, quantity });
@@ -29,6 +29,16 @@ export const addOrderToCustomer = async(event)=>{
         }
 
         await customer.save();
+
+        //pre prepare notification data
+        await Notification.create({
+            customerId:userId,
+            message: `Your order for product ${productId} has Arrived!`,
+            imageUrl,
+            productId,
+            priceAtPurchase,
+            quantity,
+        })
 
         log.info("Product added to Order successfully", { userId, productId, quantity ,name, imageUrl, priceAtPurchase });
 
@@ -74,7 +84,7 @@ export const processOrder = async (event) => {
     log.info(`Processing order event: ${JSON.stringify(event)}`);
 
     try {
-        const { userId, productId ,quantity,name, imageUrl, priceAtPurchase,message} = event;
+        const { userId, productId } = event;
 
         if (!userId || !productId) {
             log.warn("Missing required fields: userId or productId", { userId, productId });
@@ -98,16 +108,7 @@ export const processOrder = async (event) => {
         existingItem.status = "delivered";
         await customer.save();
 
-        //save product to notification db 
-        await Notification.create({
-            customerId:userId,
-            message,
-            imageUrl,
-            productId,
-            priceAtPurchase,
-            quantity,
-        })
-
+       
         log.info(`Order for Product: ${productId} marked as delivered for User: ${userId}`);
 
     } catch (error) {

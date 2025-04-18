@@ -7,8 +7,9 @@ export const markAsRead = async (req, res, next) => {
   
     try {
       const { productId } = req.params;
-      const userId = req.userId;
-  
+      const userId = req.user.userId;
+
+      
       if (!userId || !productId) {
         log.error("Missing userId or productId in request.");
         return next(new ApiError(400, "Missing user or product information."));
@@ -26,6 +27,8 @@ export const markAsRead = async (req, res, next) => {
       }
   
       notification.isRead = true;
+
+    
       await notification.save();
   
       return res.status(200).json({ success: true, message: "Notification marked as read." });
