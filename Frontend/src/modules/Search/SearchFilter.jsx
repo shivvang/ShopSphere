@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { searchProducts } from "../../services/useProduct";
 import {toast} from "react-hot-toast"
 
-function SearchFilter({searchFilter,setSearchFilter,setProducts}) {
+function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
   
   const [loading,setLoading ] = useState(false);
+  const [page, setPage] = useState(1);
 
   const fetchProducts = async () => {
     if (loading) return;
 
     setLoading(true);
 
-    const result = await searchProducts({ ...searchFilter });
+    const result = await searchProducts({ ...searchFilter,page });
 
     if (result.products) {
       setLoading(false);
@@ -50,6 +51,12 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts}) {
     fetchProducts();
   };
 
+  useEffect(()=>{
+    fetchProducts(page);
+  },[page])
+
+  console.log("page",page);
+  
   return (
     <div className="w-full md:w-[40%] lg:w-[30%] h-auto p-4 border-b md:border-r md:border-b-0 border-gray-300">
     <h1 className="text-lg font-bold mb-2">Filters</h1>
@@ -117,8 +124,28 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts}) {
         Apply Filters
       </button>
     </form>
+    {/* Pagination Controls */}
+    <div className="mt-6 flex justify-between items-center">
+        <button
+          onClick={() => {
+            setPage((prev)=>Math.max(prev-1,1));
+          }}
+          className="bg-[#FF6F00] hover:bg-[#e65c00] text-white px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+        >
+          ❮ Prev
+        </button>
+
+        <button
+          disabled = {products.length === 0}
+          onClick={() => {
+            setPage((prev)=>prev+1)
+          }}
+          className="bg-[#FF6F00] hover:bg-[#e65c00] text-white px-4 py-2 rounded-lg shadow-md disabled:opacity-50"
+        >
+        Next ❯
+      </button>
+    </div>
   </div>
-  
   )
 }
 
