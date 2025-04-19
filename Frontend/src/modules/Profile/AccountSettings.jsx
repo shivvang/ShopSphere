@@ -1,68 +1,57 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logout, resetPassword } from '../services/useAuth';
+import { logout, resetPassword } from '../../services/useAuth';
 import toast from 'react-hot-toast';
-import Spinner from '../modules/common/Spinner';
-
+import Spinner from '../common/Spinner';
 
 function AccountSettings() {
   const navigate = useNavigate();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [loading,setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleResetPassword = async(e) => {
-
+  const handleResetPassword = async (e) => {
     e.preventDefault();
 
-    if(loading) return;
+    if (loading) return;
 
-    setloading(true);
+    setLoading(true);
+    const result = await resetPassword(oldPassword, newPassword);
+    setLoading(false);
 
-    const result = await resetPassword(oldPassword,newPassword);
-
-    if(result.success){
-      setloading(false);
-      toast.success("success reset");
+    if (result.success) {
+      toast.success("Password successfully reset");
       setOldPassword("");
       setNewPassword("");
-    }else{
-      setloading(false);
+    } else {
       toast.error(result.error);
     }
-
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
+    if (loading) return;
 
-    if(loading) return;
-
-    setloading(true);
-
+    setLoading(true);
     const result = await logout();
+    setLoading(false);
 
-    if(result.success){
-      setloading(false);
-      toast.success("success full logout");
-      navigate("/auth"); 
-    }else{
-      setloading(false);
+    if (result.success) {
+      toast.success("Logged out successfully");
+      navigate("/auth");
+    } else {
       toast.error(result.error);
     }
   };
 
-  const handleGoBack = () => {
-    navigate(-1); 
-  };
+  const handleGoBack = () => navigate(-1);
 
-  return (
-    <>
-    {loading && <Spinner/>}
+  return loading ? (
+    <Spinner />
+  ) : (
     <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
         <h2 className="text-2xl font-bold text-center mb-6">Account Settings</h2>
 
-       
         <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
           <input
             type="password"
@@ -88,7 +77,6 @@ function AccountSettings() {
           </button>
         </form>
 
-      
         <button
           onClick={handleLogout}
           className="mt-4 bg-black text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-800 transition duration-200 w-full"
@@ -96,7 +84,6 @@ function AccountSettings() {
           Logout
         </button>
 
-       
         <button
           onClick={handleGoBack}
           className="mt-4 text-[#FF6F00] font-bold py-2 px-4 rounded-lg border border-[#FF6F00] hover:bg-[#FF6F00] hover:text-white transition duration-200 w-full"
@@ -105,7 +92,6 @@ function AccountSettings() {
         </button>
       </div>
     </div>
-    </>
   );
 }
 

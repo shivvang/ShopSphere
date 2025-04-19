@@ -6,7 +6,7 @@ import log from "../utils/logHandler.js"
 export const addOrderToCustomer = async(event)=>{
     log.info("Adding product to Order...", { event });
     try {
-        const { userId, productId, quantity,name, imageUrl, priceAtPurchase,message} = event;
+        const { userId, productId, quantity,name, imageUrl, priceAtPurchase,brand} = event;
 
         if (!userId || !productId || !quantity) {
             log.error("Missing userId, productId, or quantity in request", { userId, productId, quantity });
@@ -25,7 +25,7 @@ export const addOrderToCustomer = async(event)=>{
             log.warn("Product is already ordered");
             throw new ApiError(400, "Order already exists.");
         }else {
-            customer.orders.push({ productId, quantity ,name, imageUrl, priceAtPurchase });
+            customer.orders.push({ productId, quantity ,name, imageUrl, priceAtPurchase,brand });
         }
 
         await customer.save();
@@ -34,13 +34,15 @@ export const addOrderToCustomer = async(event)=>{
         await Notification.create({
             customerId:userId,
             message: `Your order for product ${productId} has Arrived!`,
+            name,
             imageUrl,
             productId,
             priceAtPurchase,
             quantity,
+            brand
         })
 
-        log.info("Product added to Order successfully", { userId, productId, quantity ,name, imageUrl, priceAtPurchase });
+        log.info("Product added to Order successfully", { userId, productId, quantity ,name, imageUrl, priceAtPurchase ,brand});
 
     } catch (error) {
         log.error("Error adding product to cart", { error: error.message, stack: error.stack });
@@ -153,6 +155,7 @@ export const createOrderFromCheckout = async (event) => {
             customer.orders.push({
                 productId: item.productId,
                 name: item.name,
+                brand: item.brand,
                 imageUrl: item.imageUrl,
                 priceAtPurchase: item.priceAtPurchase,
                 quantity: item.quantity,

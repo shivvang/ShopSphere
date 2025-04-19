@@ -7,7 +7,7 @@ export const addWishlistToCustomer = async (event) => {
     log.info("Adding product to wishlist...", { event });
 
     try {
-        const { userId, productId,name, imageUrl, price } = event;
+        const { userId, productId,name, imageUrl, price , brand} = event;
 
         if (!userId || !productId) {
             log.error("Missing userId or productId in request", { userId, productId });
@@ -27,10 +27,10 @@ export const addWishlistToCustomer = async (event) => {
             return;
         }
 
-        customer.wishlist.push({ productId , name , imageUrl , price });
+        customer.wishlist.push({ productId , name , imageUrl , price,brand });
         await customer.save();
 
-        log.info("Product added to wishlist successfully", { userId, productId ,name, imageUrl, price});
+        log.info("Product added to wishlist successfully", { userId, productId ,name, imageUrl, price,brand});
 
     } catch (error) {
         log.error("Error adding product to wishlist", { error: error.message, stack: error.stack });

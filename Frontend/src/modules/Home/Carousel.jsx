@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Carousel({ products }) {
   const [index, setIndex] = useState(0);
@@ -74,4 +74,4 @@ function Carousel({ products }) {
   );
 }
 
-export default Carousel;
+export default React.memo(Carousel);

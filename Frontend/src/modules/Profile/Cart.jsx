@@ -1,14 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { fetchCart } from "../services/useProfile";
+import { fetchCart } from "../../services/useProfile";
 import toast from "react-hot-toast";
-import Spinner from "../modules/common/Spinner";
-import { checkoutOrder, clearCart, removeFromCart, setOrder } from "../services/useShopping";
+import Spinner from "../common/Spinner";
+import { checkoutOrder, clearCart, removeFromCart, setOrder } from "../../services/useShopping";
 
 function Cart() {
     const [cart, setCart] = useState([]);
     const [loading,setLoading] = useState(false);
-    const [stateChange,setStateChange] = useState(false);
 
     async function getCart() {
       const result = await fetchCart();
@@ -16,29 +15,24 @@ function Cart() {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("fetched Cart Item's");
         setCart(result.cart);
       }
     }
   
     useEffect(() => {
-      if(stateChange) return;
       getCart();
-    }, [stateChange]);
+    }, []);
   
     const handleRemoveFromCart = async(productId)=>{
-
       if(loading)return;
 
       setLoading(true);
-
-      setCart((prev)=>prev.filter((item)=>item.productId !== productId))
 
       const response = await removeFromCart(productId);
 
          if(response.success){
           toast.success("Removed from Cart");
-          setStateChange(true);
+          setCart((prev)=>prev.filter((item)=>item.productId !== productId))
          }else{
           toast.error(response.error);
          }
@@ -49,21 +43,19 @@ function Cart() {
         if(loading)return;
 
         setLoading(true);
-
-        setCart([]);
-
+        
         const response = await clearCart();
 
         if(response.success){
           toast.success("Cleared Cart");
-          setStateChange(true);
+          setCart([]);
         }else{
           toast.error(response.error);
         }
         setLoading(false);
       } 
       
-      const handleOrderNow = async (productId, name, imageUrl, priceAtPurchase) => {
+      const handleOrderNow = async (productId, name, imageUrl,bramd, priceAtPurchase) => {
         if (loading) return;
       
         setLoading(true);
@@ -73,7 +65,7 @@ function Cart() {
         try {
           const [removeResponse, orderResponse] = await Promise.all([
             removeFromCart(productId),
-            setOrder(productId, name, imageUrl, priceAtPurchase)
+            setOrder(productId, name, imageUrl, bramd,priceAtPurchase)
           ]);
       
           if (orderResponse.success) {
@@ -125,8 +117,8 @@ function Cart() {
 
     
   return ( 
-    <>
-    {loading && <Spinner/>}
+    loading ? (<Spinner/>):(
+      <>
     <div className="min-h-screen bg-black text-white p-6">
     <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-bold text-white mb-4">Shopping Cart</h2>
@@ -159,7 +151,8 @@ function Cart() {
         </button>
       </div>
     )}
-   </>
+    </>
+  )
   )
 }
 
@@ -168,23 +161,43 @@ export default Cart
 
 function CartProduct({ product ,handleRemoveFromCart,handleOrderNow }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 flex flex-col items-center transition-transform hover:scale-105">
+    <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center text-center transition-transform hover:scale-[1.03] hover:shadow-2xl duration-300 ease-in-out w-full max-w-sm mx-auto">
+      
+    <div className="w-full h-48 overflow-hidden rounded-xl mb-4">
       <img
         src={product.imageUrl}
         alt={product.name}
-        className="w-32 h-32 object-cover rounded-lg"
+        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
       />
-      <h3 className="text-lg font-semibold text-black mt-2">{product.name}</h3>
-      <p className="text-orange-600 font-bold text-xl mt-1">₹{product.price}</p>
-      <p className="text-gray-600 mt-1">Quantity: {product.quantity}</p>
-      <div className="flex space-x-2 mt-3">
-        <button className="bg-[#FF6F00] text-white px-3 py-2 rounded-lg hover:bg-orange-700 transition" onClick={()=>handleRemoveFromCart(product.productId)}>
-          Remove
-        </button>
-        <button onClick={()=>handleOrderNow(product.productId,product.name,product.imageUrl,product.price)} className="bg-black text-white px-3 py-2 rounded-lg border border-gray-400 hover:bg-gray-900 transition">
-          Order Now
-        </button>
-      </div>
     </div>
+
+    <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
+    <p className="text-gray-500 text-sm mt-1">{product.brand}</p>
+    <p className="text-orange-600 font-extrabold text-2xl mt-2">₹{product.price}</p>
+    <p className="text-gray-600 text-sm mt-1">Qty: <span className="font-medium">{product.quantity}</span></p>
+
+    <div className="flex flex-col sm:flex-row gap-3 mt-5 w-full">
+      <button
+        onClick={() => handleRemoveFromCart(product.productId)}
+        className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-semibold transition-all duration-300"
+      >
+        Remove
+      </button>
+      <button
+        onClick={() =>
+          handleOrderNow(
+            product.productId,
+            product.name,
+            product.imageUrl,
+            product.brand,
+            product.price
+          )
+        }
+        className="flex-1 bg-gradient-to-r from-black to-gray-800 text-white py-2 rounded-xl font-semibold border border-gray-400 hover:from-gray-900 hover:to-black transition-all duration-300"
+      >
+        Order Now
+      </button>
+    </div>
+  </div>
   );
 }

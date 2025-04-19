@@ -7,6 +7,7 @@ const wishlistSchema = new Schema({
       productId: { type:Schema.Types.ObjectId, ref: "Product", required: true },
       name: String,
       imageUrl: String,
+      brand:String,
       price: Number,
     }
   ],

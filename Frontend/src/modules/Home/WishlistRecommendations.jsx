@@ -1,9 +1,10 @@
+import React from "react";
+
 /* eslint-disable react/prop-types */
-function ListOfProduct({ products=[] ,handleAddToWishlist}) {
+function WishlistRecommendations ({ products=[] ,handleAddToWishlist}) {
   return (
     <div className="mt-12 px-4 md:px-10 lg:px-20">
       <div className="p-6 bg-[#1a1a1a] rounded-xl shadow-md">
-        {/* ✅ Heading */}
         <h2 className="text-2xl font-bold text-white mb-4">
           🔥 You Might Like This
         </h2>
@@ -49,7 +50,7 @@ function ListOfProduct({ products=[] ,handleAddToWishlist}) {
 
               {/* ✅ Wishlist Button */}
               <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all"
-              onClick={()=>{handleAddToWishlist(product.id,product.name,product.imageUrl,product.price)}}>
+              onClick={()=>{handleAddToWishlist(product.id,product.name,product.imageUrl,product.brand,product.price)}}>
                 Add to Wishlist
               </button>
             </div>
@@ -61,4 +62,4 @@ function ListOfProduct({ products=[] ,handleAddToWishlist}) {
   );
 }
 
-export default ListOfProduct;
+export default React.memo(WishlistRecommendations );

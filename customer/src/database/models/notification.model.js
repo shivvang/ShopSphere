@@ -3,7 +3,9 @@ import  { Schema,model }  from "mongoose";
 const notificationSchema = new Schema({
     customerId: { type:Schema.Types.ObjectId, ref: 'Customer', required: true },
     message: String,
+    name:String,
     imageUrl: String,
+    brand:String,
     productId: { type:Schema.Types.ObjectId, ref: 'Customer', required: true },
     priceAtPurchase: Number,
     quantity: Number,

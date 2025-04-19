@@ -7,6 +7,7 @@ const orderSchema = new Schema({
       productId: { type:Schema.Types.ObjectId, ref: "Product", required: true },
       name: String,
       imageUrl: String,
+      brand:String,
       priceAtPurchase: Number,
       quantity: Number,
       status: { type: String, enum: [ "shipped", "delivered", "cancelled"], default: "shipped" },

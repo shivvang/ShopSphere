@@ -1,29 +1,7 @@
 import {useNavigate}  from "react-router-dom";
+import { categories } from "../../data/categories";
 
-const categories = [
-  "Mobiles",
-  "Fashion",
-  "Electronics",
-  "Home & Furnitures",
-  "Appliances",
-  "Books & Media",
-  "Sports & Fitness",
-  "Health & Personal Care",
-  "Baby & Kids",
-  "Pet Supplies",
-  "Musical Instruments",
-  "Arts & Crafts",
-  "Garden & Outdoor",
-  "Watches & Accessories",
-  "Jewellery",
-  "Footwear",
-  "Kitchen & Dining",
-  "Tools & Hardware",
-  "Cameras",
-  "Smart Home Devices",
-  "Video Games & Consoles",
-  "Luggage & Suitcases",
-];
+
 
 export default function Category() {
 

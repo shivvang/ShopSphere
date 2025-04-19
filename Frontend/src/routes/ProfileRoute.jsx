@@ -1,9 +1,9 @@
 import {Routes,Route, Navigate} from "react-router-dom";
 import Profile from "../pages/Profile";
-import Wishlist from "../pages/Wishlist";
-import Cart from "../pages/Cart";
-import Orders from "../pages/Orders";
-import AccountSettings from "../pages/AccountSettings";
+import Wishlist from "../modules/Profile/Wishlist";
+import Cart from "../modules/Profile/Cart";
+import Orders from "../modules/Profile/Orders";
+import AccountSettings from "../modules/Profile/AccountSettings";
 
 function ProfileRoute() {
     return (

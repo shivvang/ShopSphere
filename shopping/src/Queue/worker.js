@@ -13,7 +13,7 @@ log.info("🔥 Delivery Worker started and ready to process jobs...");
 const deliveryWorker = new Worker(
     "DeliveryQueue",
     async (job) => {
-        const { userId, productId, priceAtPurchase, quantity } = job.data;
+        const { userId, productId, priceAtPurchase, quantity,brand } = job.data;
 
         log.info(`Processing order for product ${productId}, delivery for user ${userId}`);
 
@@ -23,7 +23,7 @@ const deliveryWorker = new Worker(
                 return;
             }
 
-            if (!priceAtPurchase || !quantity) {
+            if (!priceAtPurchase || !quantity || !brand) {
                 log.warn("Order data is incomplete: missing priceAtPurchase or quantity.");
                 return;
             }
@@ -64,7 +64,7 @@ const deliveryWorker = new Worker(
 
 
 deliveryWorker.on("completed", (job) => {
-    const { userId, productId, priceAtPurchase, quantity,imageUrl } = job.data;
+    const { userId, productId, priceAtPurchase, quantity,imageUrl,brand,name} = job.data;
 
     log.info(`Order processing completed for user ${userId}, product ${productId}`);
 
@@ -78,7 +78,9 @@ deliveryWorker.on("completed", (job) => {
         productId,
         priceAtPurchase,
         quantity,
-        imageUrl
+        imageUrl,
+        name,
+        brand,
     });
 });
 

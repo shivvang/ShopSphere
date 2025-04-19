@@ -6,10 +6,10 @@ import {toast} from "react-hot-toast";
 function ProductCard({ product }) {
     const [loading,setLoading] = useState(false);
 
-    const handleAddToWishlist = async(productId,name,imageUrl,price)=>{
+    const handleAddToWishlist = async(productId,name,imageUrl,brand,price)=>{
        
       setLoading(true);
-      const data = await addToWishlist(productId,name,imageUrl,price);  
+      const data = await addToWishlist(productId,name,imageUrl,brand,price);  
 
       if(data.success){
         setLoading(false)
@@ -22,10 +22,10 @@ function ProductCard({ product }) {
 
     
     
-    const handleAddToCart = async(productId,name,imageUrl,price)=>{
+    const handleAddToCart = async(productId,name,imageUrl,brand,price)=>{
        setLoading(true);
 
-       const data = await addToCart(productId,name,imageUrl,price);  
+       const data = await addToCart(productId,name,imageUrl,brand,price);  
 
       if(data.success){
         setLoading(false)
@@ -36,14 +36,14 @@ function ProductCard({ product }) {
       }
     }
 
-    const handleBuyNow = async(productId,name,imageUrl,priceAtPurchase)=>{
+    const handleBuyNow = async(productId,name,imageUrl,brand,priceAtPurchase)=>{
       setLoading(true);
 
-      const data = await setOrder(productId,name,imageUrl,priceAtPurchase);
+      const data = await setOrder(productId,name,imageUrl,brand,priceAtPurchase);
 
       if(data.success){
         setLoading(false)
-        toast.success("successfully Order");
+        toast.success("successfully Ordered");
       }else{
         setLoading(false)
         toast.error(data.error);
@@ -74,17 +74,17 @@ function ProductCard({ product }) {
           <p className="font-bold"> ₹{product.price.toFixed(2)}</p>
         )}
       </div>
-        <button disabled={loading} className="mt-3 bg-[#F5F5F5] text-black w-full py-2 rounded-lg hover:bg-gray-300" onClick={()=>handleAddToWishlist(product._id,product.name,product.imageUrl,product.finalPrice)}>
+        <button disabled={loading} className="mt-3 bg-[#F5F5F5] text-black w-full py-2 rounded-lg hover:bg-gray-300" onClick={()=>handleAddToWishlist(product._id,product.name,product.imageUrl,product.brand,product.finalPrice)}>
           Add to Wishlist
         </button>
 
       <div className="flex mt-3 gap-2">
        
-        <button onClick={()=>handleAddToCart(product._id,product.name,product.imageUrl,product.finalPrice)} disabled={loading} className="bg-[#FF6F00] text-white w-1/2 py-2 rounded-lg hover:bg-[#e65c00]">
+        <button onClick={()=>handleAddToCart(product._id,product.name,product.imageUrl,product.brand,product.finalPrice)} disabled={loading} className="bg-[#FF6F00] text-white w-1/2 py-2 rounded-lg hover:bg-[#e65c00]">
           Add to Cart
         </button>
 
-        <button onClick={()=>handleBuyNow(product._id,product.name,product.imageUrl,product.finalPrice)} disabled={loading} className="bg-[#333333] text-white w-1/2 py-2 rounded-lg hover:bg-[#1a1a1a]">
+        <button onClick={()=>handleBuyNow(product._id,product.name,product.imageUrl,product.brand,product.finalPrice)} disabled={loading} className="bg-[#333333] text-white w-1/2 py-2 rounded-lg hover:bg-[#1a1a1a]">
           Buy Now
         </button>
       </div>

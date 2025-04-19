@@ -9,14 +9,14 @@ export const addToWishlist = async (req, res, next) => {
     try {
         const userId = req.user;
         const productId = req.params.productId;
-        const { name, imageUrl, price } = req.body;
+        const { name, imageUrl, price,brand } = req.body;
 
         if (!userId || !productId) {
             log.warn("User ID or Product ID is missing from request");
             return next(new ApiError("User ID and Product ID are required", 400));
         }
 
-        if (!name || !imageUrl || !price) {
+        if (!name || !imageUrl || !price || !brand) {
             log.warn("Product details are missing from request body");
             return next(new ApiError("Product name, image URL, and price are required", 400));
         }
@@ -25,7 +25,7 @@ export const addToWishlist = async (req, res, next) => {
 
         if (!wishlist) {
             log.info(`Creating a new wishlist for user: ${userId}`);
-            wishlist = new Wishlist({ userId, items: [{ productId, name, imageUrl, price }] });
+            wishlist = new Wishlist({ userId, items: [{ productId, name, imageUrl, price ,brand }] });
         } else {
             const productExists = wishlist.items.some(item => item.productId.toString() === productId);
 
@@ -34,11 +34,11 @@ export const addToWishlist = async (req, res, next) => {
                 return res.status(200).json({ message: "Product is already in your wishlist" });
             }
 
-            wishlist.items.push({ productId, name, imageUrl, price });
+            wishlist.items.push({ productId, name, imageUrl, price,brand });
             log.info(`Added product ${productId} to wishlist for user: ${userId}`);
         }
 
-        await publishEventToExchange("wishlist.itemAdded", { userId,productId,name, imageUrl, price});
+        await publishEventToExchange("wishlist.itemAdded", { userId,productId,name, imageUrl,brand,price});
         await wishlist.save();
         return res.status(201).json({success: true, message: "Product successfully added to wishlist" });
     } catch (error) {

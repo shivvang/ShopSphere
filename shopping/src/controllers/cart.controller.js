@@ -9,9 +9,9 @@ export const addItemToCart = async (req, res, next) => {
     try {
         const userId = req.user;
         const productId = req.params.productId;
-        let  { name, imageUrl, price, quantity = 1 } = req.body;
+        let  { name, imageUrl, price, quantity = 1 ,brand} = req.body;
 
-        if (!productId || !name || !imageUrl || !price || quantity <= 0) {
+        if (!productId || !name || !imageUrl || !price || quantity <= 0 || !brand) {
             log.warn("Invalid input: Missing required fields or invalid quantity");
             return next(new ApiError("All fields are required and quantity must be greater than zero", 400));
         }
@@ -22,7 +22,7 @@ export const addItemToCart = async (req, res, next) => {
             log.info(`Creating a new cart for user: ${userId}`);
             cart = new Cart({
                 userId,
-                items: [{ productId, name, imageUrl, price, quantity }]
+                items: [{ productId, name, imageUrl, price, quantity,brand }]
             });
         } else {
             const existingItem = cart.items.find(item => item.productId.toString() === productId);
@@ -33,12 +33,12 @@ export const addItemToCart = async (req, res, next) => {
                 existingItem.quantity = quantity;
             } else {
                 log.info(`Adding new product ${productId} to cart`);
-                cart.items.push({ productId, name, imageUrl, price, quantity });
+                cart.items.push({ productId, name, imageUrl, price, quantity,brand});
             }
         }
 
         await cart.save();
-        await publishEventToExchange("cart.add", { userId, productId, quantity,name, imageUrl, price });
+        await publishEventToExchange("cart.add", { userId, productId, quantity,name, imageUrl, price,brand});
 
         return res.status(200).json({ success: true, message: "Item added to cart successfully", cart });
     } catch (error) {

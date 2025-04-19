@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { searchProducts } from "../../services/useProduct";
 import {toast} from "react-hot-toast"
-
+import { categories } from "../../data/categories";
 
 function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
   const [loading,setLoading ] = useState(false);
@@ -56,31 +56,6 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
   },[page])
 
 
-  const categories = [
-    "Mobiles",
-    "Fashion",
-    "Electronics",
-    "Home & Furnitures",
-    "Appliances",
-    "Books & Media",
-    "Sports & Fitness",
-    "Health & Personal Care",
-    "Baby & Kids",
-    "Pet Supplies",
-    "Musical Instruments",
-    "Arts & Crafts",
-    "Garden & Outdoor",
-    "Watches & Accessories",
-    "Jewellery",
-    "Footwear",
-    "Kitchen & Dining",
-    "Tools & Hardware",
-    "Cameras",
-    "Smart Home Devices",
-    "Video Games & Consoles",
-    "Luggage & Suitcases",
-  ]
-  
   return (
     <div className="w-full md:w-[40%] lg:w-[30%] h-auto p-4 border-b md:border-r md:border-b-0 border-gray-300">
     <h1 className="text-lg font-bold mb-2">Filters</h1>

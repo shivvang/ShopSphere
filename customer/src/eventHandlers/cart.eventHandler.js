@@ -5,7 +5,7 @@ import log from "../utils/logHandler.js"
 export const addCartToCustomer = async (event) => {
     log.info("Adding product to cart...", { event });
     try {
-        const { userId, productId, quantity,name, imageUrl, price } = event;
+        const { userId, productId, quantity,name, imageUrl, price,brand } = event;
 
         if (!userId || !productId || !quantity) {
             log.error("Missing userId, productId, or quantity in request", { userId, productId, quantity });
@@ -23,12 +23,12 @@ export const addCartToCustomer = async (event) => {
         if (existingItem) {
             existingItem.quantity = quantity;
         } else {
-            customer.cart.push({ productId, quantity,name, imageUrl, price });
+            customer.cart.push({ productId, quantity,name, imageUrl, price,brand });
         }
 
         await customer.save();
 
-        log.info("Product added to cart successfully", { userId, productId, quantity ,name, imageUrl, price});
+        log.info("Product added to cart successfully", { userId, productId, quantity ,name, imageUrl, price,brand});
 
     } catch (error) {
         log.error("Error adding product to cart", { error: error.message, stack: error.stack });

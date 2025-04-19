@@ -3,9 +3,9 @@ import axios from "axios";
 const wishlistRoute = "http://localhost:8000/v1/wishlist";
 
 //wishlist
-export const addToWishlist = async(productId,name,imageUrl,price)=>{
+export const addToWishlist = async(productId,name,imageUrl,brand,price)=>{
     try {
-        const response = await axios.post(`${wishlistRoute}/add/${productId}`,{name,imageUrl,price},{withCredentials:true});
+        const response = await axios.post(`${wishlistRoute}/add/${productId}`,{name,imageUrl,brand,price},{withCredentials:true});
 
         if (!response.data.success) return { error: response.data.message || "add to wishlist failed." };
 
@@ -67,9 +67,9 @@ export const clearWishlistItem = async()=>{
 const CartRoute = "http://localhost:8000/v1/cart";
 
 
-export const addToCart = async (productId,name,imageUrl,price)=>{
+export const addToCart = async (productId,name,imageUrl,brand,price)=>{
   try {
-    const response = await axios.post(`${CartRoute}/add/${productId}`,{name,imageUrl,price},{withCredentials:true});
+    const response = await axios.post(`${CartRoute}/add/${productId}`,{name,imageUrl,brand,price},{withCredentials:true});
 
         if (!response.data.success) return { error: response.data.message || "add to cart failed." };
 
@@ -129,9 +129,9 @@ export const clearCart = async()=>{
 
 const orderRoute = "http://localhost:8000/v1/orders";
 
-export const setOrder = async(productId,name,imageUrl,priceAtPurchase)=>{
+export const setOrder = async(productId,name,imageUrl,brand,priceAtPurchase)=>{
   try {
-    const response = await axios.post(`${orderRoute}/add/${productId}`,{name,imageUrl,priceAtPurchase}, {withCredentials:true});
+    const response = await axios.post(`${orderRoute}/add/${productId}`,{name,imageUrl,brand,priceAtPurchase}, {withCredentials:true});
 
     if (!response.data.success) return { error: response.data.message || "failed to set order." };
 

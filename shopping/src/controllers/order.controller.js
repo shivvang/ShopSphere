@@ -10,9 +10,9 @@ export const setOrder = async (req, res, next) => {
     try {
         const userId = req.user;
         const productId = req.params.productId;
-        let { name, imageUrl, priceAtPurchase, quantity = 1 } = req.body;
+        let { name, imageUrl, priceAtPurchase, quantity = 1 ,brand} = req.body;
 
-        if (!userId || !productId || !quantity || quantity <= 0 || !priceAtPurchase || priceAtPurchase <= 0) {
+        if (!userId || !productId || !quantity || quantity <= 0 || !priceAtPurchase || priceAtPurchase <= 0 || !brand) {
             log.warn("Invalid request: Missing or invalid fields.");
             return next(new ApiError("Invalid request. Ensure all required fields are provided correctly.", 400));
         }
@@ -20,7 +20,7 @@ export const setOrder = async (req, res, next) => {
         let order = await Order.findOne({ userId, "items.productId": productId,"items.status": { $ne: "cancelled" } });
 
         if (order) {
-            log.info(`Order exists for product ${productId} by user ${userId}. Updating quantity.`);
+            log.info(`Order exists for product ${productId} by user ${userId}.`);
             
             return res.status(400).json({ 
                 message: `Order for product ${productId} already exists. Cannot place another order for the same product.` 
@@ -30,7 +30,7 @@ export const setOrder = async (req, res, next) => {
            
         order = new Order({
             userId,
-            items: [{ productId, name, imageUrl, priceAtPurchase, quantity}],
+            items: [{ productId, name, imageUrl, priceAtPurchase, quantity,brand}],
         });
 
         await order.save();
@@ -38,7 +38,7 @@ export const setOrder = async (req, res, next) => {
         log.info(`Order saved for user ${userId} and product ${productId}.`);
 
        
-        const jobData = { userId, productId, priceAtPurchase, quantity,imageUrl };
+        const jobData = { userId, productId, priceAtPurchase, quantity,imageUrl,brand,name};
 
        
         const delay = 60 * 1000; // 7 days in milliseconds
@@ -53,7 +53,7 @@ export const setOrder = async (req, res, next) => {
             });    
         
 
-        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase });
+        await publishEventToExchange("order.place", { userId, productId, quantity,name, imageUrl, priceAtPurchase,brand});
 
         log.info(`Order processing event published for order: ${order._id}`);
         return res.status(201).json({ success: true, message: "Order placed successfully", order });
@@ -155,6 +155,7 @@ export const checkoutCart = async (req, res, next) => {
                     imageUrl: item.imageUrl,
                     priceAtPurchase: item.price,
                     quantity: item.quantity,
+                    brand:item.brand
                 }))
             });
         
@@ -193,6 +194,7 @@ export const checkoutCart = async (req, res, next) => {
                 productId: item.productId,
                 name: item.name,
                 imageUrl:item.imageUrl,
+                brand:item.brand,
                 priceAtPurchase: item.priceAtPurchase,
                 quantity: item.quantity,
                 status: item.status

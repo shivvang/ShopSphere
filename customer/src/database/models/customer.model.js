@@ -22,6 +22,7 @@ const customerSchema = new mongoose.Schema(
           productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
           name: String,
           imageUrl: String,
+          brand:String,
           price: Number,
           quantity: { type: Number, required: true, min: 1 },
         }
@@ -31,6 +32,7 @@ const customerSchema = new mongoose.Schema(
           productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
           name: String,
           imageUrl: String,
+          brand:String,
           price: Number,
         }
       ],
@@ -40,6 +42,7 @@ const customerSchema = new mongoose.Schema(
           quantity: { type: Number, required: true, min: 1 },
           name: String,
           imageUrl: String,
+          brand:String,
           priceAtPurchase: Number,
           status: { type: String, enum: ["shipped", "delivered", "cancelled"], default: "shipped" },
         }
