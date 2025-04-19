@@ -61,7 +61,6 @@ function MainContent() {
       try {
         const response = await GetOrderedRecommendations(currentCustomer.id);
         if (response.success) {
-          console.log(response.products);
           setRecommendedOrderedProducts(response.products);
         } else {
           toast.error(response.message || "Failed to fetch recommendations");

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { searchProducts } from "../../services/useProduct";
 import {toast} from "react-hot-toast"
 
+
 function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
-  
   const [loading,setLoading ] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -14,11 +14,11 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
 
     setLoading(true);
 
+    ;
     const result = await searchProducts({ ...searchFilter,page });
 
     if (result.products) {
       setLoading(false);
-      toast.success("Fetched products successfully");
       setProducts(result.products);
     } else {
       setLoading(false);
@@ -43,7 +43,7 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
     }, 500);
   
     return () => clearTimeout(timeout);
-  }, [searchFilter.searchQuery]);
+  }, [searchFilter]);
 
  
   const handleSubmit = async (e) => {
@@ -52,10 +52,34 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
   };
 
   useEffect(()=>{
-    fetchProducts(page);
+    fetchProducts();
   },[page])
 
-  console.log("page",page);
+
+  const categories = [
+    "Mobiles",
+    "Fashion",
+    "Electronics",
+    "Home & Furnitures",
+    "Appliances",
+    "Books & Media",
+    "Sports & Fitness",
+    "Health & Personal Care",
+    "Baby & Kids",
+    "Pet Supplies",
+    "Musical Instruments",
+    "Arts & Crafts",
+    "Garden & Outdoor",
+    "Watches & Accessories",
+    "Jewellery",
+    "Footwear",
+    "Kitchen & Dining",
+    "Tools & Hardware",
+    "Cameras",
+    "Smart Home Devices",
+    "Video Games & Consoles",
+    "Luggage & Suitcases",
+  ]
   
   return (
     <div className="w-full md:w-[40%] lg:w-[30%] h-auto p-4 border-b md:border-r md:border-b-0 border-gray-300">
@@ -91,9 +115,11 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
         className="w-full p-2 border rounded mb-4"
       >
         <option value="">All Categories</option>
-        <option value="electronics">Electronics</option>
-        <option value="fashion">Fashion</option>
-        <option value="home">Home</option>
+        {categories.map((cat) => (
+        <option key={cat} value={cat}>
+          {cat}
+        </option>
+        ))}
       </select>
   
       <label className="block mb-2 font-semibold">Brand</label>

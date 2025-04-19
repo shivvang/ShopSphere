@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import MainContent from "../modules/Search/MainContent"
 import SearchFilter from "../modules/Search/SearchFilter"
-
+import { useLocation,useNavigate  } from "react-router-dom";
 
 function Search({searchQuery}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const categoryFromURL = queryParams.get("category") || "";
 
   const [searchFilter,setSearchFilter] = useState(
     {
       searchQuery: searchQuery,
-      category:"",
+      category:categoryFromURL,
       brand:"",
       discount:"",
       price:"",
@@ -21,8 +25,21 @@ function Search({searchQuery}) {
     useEffect(() => {
       setSearchFilter((prevfilter)=>({...prevfilter,searchQuery:searchQuery}))
     },[searchQuery])
- 
 
+    useEffect(() => {
+      if (categoryFromURL) {
+        const newParams = new URLSearchParams(location.search);
+        newParams.delete("category");
+  
+        navigate(
+          {
+            pathname: location.pathname,
+            search: newParams.toString(),
+          },
+          { replace: true }
+        );
+      }
+    }, []);
   const [products,setProducts] = useState([]);
 
   return (

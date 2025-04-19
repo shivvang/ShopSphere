@@ -1,16 +1,34 @@
+import {useNavigate}  from "react-router-dom";
+
 const categories = [
-  "Kilos",
   "Mobiles",
   "Fashion",
   "Electronics",
   "Home & Furnitures",
   "Appliances",
-  "Flight Bookings",
-  "Beauty, Toys & More",
-  "Two Wheelers",
+  "Books & Media",
+  "Sports & Fitness",
+  "Health & Personal Care",
+  "Baby & Kids",
+  "Pet Supplies",
+  "Musical Instruments",
+  "Arts & Crafts",
+  "Garden & Outdoor",
+  "Watches & Accessories",
+  "Jewellery",
+  "Footwear",
+  "Kitchen & Dining",
+  "Tools & Hardware",
+  "Cameras",
+  "Smart Home Devices",
+  "Video Games & Consoles",
+  "Luggage & Suitcases",
 ];
 
 export default function Category() {
+
+  const navigate = useNavigate();
+
   return (
     <div className="flex gap-4 overflow-x-auto whitespace-nowrap py-3 scrollbar-thin scrollbar-thumb-[#FF6F00] scrollbar-track-gray-900">
       {categories.map((category, index) => {
@@ -30,6 +48,7 @@ export default function Category() {
               borderRadius: index % 2 === 0 ? "12px 24px 12px 24px" : "24px 12px 24px 12px",
               boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
             }}
+            onClick={()=>{navigate(`/search?category=${category}`)}}
           >
             {category}
           </span>
