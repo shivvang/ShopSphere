@@ -89,20 +89,20 @@ export const validateSearchFilters = (data) => {
       }),
 
     price: Joi.string()
-      .trim()
-      .pattern(/^\d+-\d+$/) // "min-max" format like "100-500"
-      .optional()
-      .messages({
-        "string.pattern.base": "Price should be in 'min-max' format (e.g., '100-500').",
-      }),
-
-    rating: Joi.string()
-      .trim()
-      .pattern(/^\d(\.\d+)?-\d(\.\d+)?$/) // "min-max" format like "4.0-5.0"
-      .optional()
-      .messages({
-        "string.pattern.base": "Rating should be in 'min-max' format (e.g., '4.0-5.0').",
-      }),
+    .trim()
+    .pattern(/^\d+$/)
+    .custom((value, helpers) => {
+      const num = parseInt(value, 10);
+      if (num < 1 || num > 1000000000) {
+        return helpers.error("any.invalid");
+      }
+      return value;
+    }, "Price range validation")
+    .optional()
+    .messages({
+      "string.pattern.base": "Price must be a numeric value.",
+      "any.invalid": "Price must be between 1 and 1,000,000,000.",
+    }),
 
     sortOrder: Joi.string()
       .trim()

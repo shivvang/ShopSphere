@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { login } from "../services/useAuth";
 import {useNavigate} from "react-router-dom"
 import toast from "react-hot-toast";
@@ -21,7 +21,12 @@ function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const handleSubmit = async(e)=>{
+    const handleChange = useCallback((e)=>{
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    },[])
+
+    const handleSubmit = useCallback(async(e)=>{
       e.preventDefault();
 
       dispatch(signInRequest());
@@ -38,11 +43,11 @@ function Login() {
         toast.error(result.error);
       }
 
-    }
+    },[dispatch,formData,navigate])
+
+    if(loading) return <Spinner/>;
 
     return (
-      <>
-      {loading && <Spinner/>}
         <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
        
           <div className="flex flex-col justify-center items-center sm:gap-7  md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
@@ -59,14 +64,16 @@ function Login() {
               <input 
                 className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]" 
                 type="email" placeholder="Enter Email" 
+                name="email"
                 value={formData.email}
-                onChange={(e)=>setFormData((prev)=>({...prev,email:e.target.value}))}
+                onChange={handleChange}
               />
               <input 
                 className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]" 
                 type="password" placeholder="Enter Password" 
+                name="password"
                 value={formData.password}  
-                onChange={(e)=>setFormData((prev)=>({...prev,password:e.target.value}))} 
+                onChange={handleChange} 
               />
               <button 
                 className="w-full text-[#FF6F00] border border-[#FF6F00] py-3 rounded-md font-semibold hover:bg-[#FF6F00] hover:text-white transition"
@@ -81,7 +88,6 @@ function Login() {
             </form>
           </div>
         </div>
-        </>
       );
 }
 

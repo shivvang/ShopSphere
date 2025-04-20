@@ -13,7 +13,7 @@ function Search({searchQuery}) {
 
   const [searchFilter,setSearchFilter] = useState(
     {
-      searchQuery: searchQuery,
+      searchQuery,
       category:categoryFromURL,
       brand:"",
       discount:"",
@@ -21,10 +21,6 @@ function Search({searchQuery}) {
       rating:"",
       sortOrder: "price_desc"
     })
-
-    useEffect(() => {
-      setSearchFilter((prevfilter)=>({...prevfilter,searchQuery:searchQuery}))
-    },[searchQuery])
 
     useEffect(() => {
       if (categoryFromURL) {
@@ -40,6 +36,7 @@ function Search({searchQuery}) {
         );
       }
     }, []);
+    
   const [products,setProducts] = useState([]);
 
   return (

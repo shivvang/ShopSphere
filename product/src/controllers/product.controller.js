@@ -111,6 +111,8 @@ export const searchProducts = async (req, res, next) => {
     }
 
     const { searchQuery, category, brand, discount, price, rating, sortOrder } = req.body;
+
+
     const searchPage = parseInt(req.query.page) || 1;
     const pageSize = 9;
     const skipCount = (searchPage - 1) * pageSize;
@@ -122,13 +124,13 @@ export const searchProducts = async (req, res, next) => {
       filters.$or = [
         { tags: { $in: searchQuery.split(" ") } },
         { searchKeywords: { $in: searchQuery.split(" ") } },
-        { $text: { $search: searchQuery } }, // Secondary search (name & description)
+        { $text: { $search: searchQuery } }, 
       ];
     }
 
     // **Filtering Layer**
     if (category) filters.category = category;
-    if (brand) filters.brand = brand;
+    if (brand) filters.brand = { $regex: brand, $options: "i" };
     if (discount) filters.discount = { $gte: parseFloat(discount) };
     if (price) filters.price = { $lte: parseFloat(price) };
     if (rating) filters.ratings = { $gte: parseFloat(rating) };

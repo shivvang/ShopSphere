@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {useNavigate} from "react-router-dom"
 import { register } from "../services/useAuth.js";
 import { StoreIcon } from "lucide-react";
@@ -15,7 +15,12 @@ function Register() {
 
   const [loading,setLoading] = useState(false);
 
-  const handleSubmit= async(e)=>{
+  const handleChange = useCallback((e)=>{
+    const {name,value} = e.target;
+    setFormData((prev)=>({...prev,[name]:value}))
+  },[]);
+
+  const handleSubmit= useCallback(async(e)=>{
     e.preventDefault();
 
     if(loading) return;
@@ -31,11 +36,10 @@ function Register() {
       setLoading(false);
       toast.error(result.error);
     }
-  }
+  },[loading,formData,navigate]);
 
   return (
-    <>
-    {loading && <Spinner/>}
+    loading ? (<Spinner/>):(
     <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
       {/* Left Side - Branding Section */}
       <div className="flex flex-col justify-center items-center sm:gap-7  md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
@@ -52,20 +56,23 @@ function Register() {
           <input 
             className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]" 
             type="text" placeholder="Enter Mobile Number" 
+            name="phone"
             value={formData.phone}
-            onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
+            onChange={handleChange}
           />
           <input 
             className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]" 
             type="email" placeholder="Enter Email" 
+            name="email"
             value={FormData.email}
-            onChange={(e)=>setFormData((prev)=>({...prev,email:e.target.value}))}
+            onChange={handleChange}
           />
           <input 
             className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]" 
             type="password" placeholder="Enter Password" 
+            name="password"
             value={formData.password}
-            onChange={(e)=>setFormData((prev)=>({...prev,password:e.target.value}))}
+            onChange={handleChange}
           />
 
           <button className="w-full bg-[#FF6F00] text-white py-3 rounded-md font-semibold hover:bg-[#e65c00] transition">
@@ -84,7 +91,7 @@ function Register() {
         </div>
       </div>
     </div>
-    </>
+    )
   );
 }
 

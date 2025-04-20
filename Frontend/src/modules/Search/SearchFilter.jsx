@@ -10,11 +10,11 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
   const [page, setPage] = useState(1);
 
   const fetchProducts = async () => {
+
     if (loading) return;
 
     setLoading(true);
 
-    ;
     const result = await searchProducts({ ...searchFilter,page });
 
     if (result.products) {
@@ -56,6 +56,14 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
   },[page])
 
 
+  useEffect(() => {
+    setPage(1); // reset to first page when filters change
+  }, [searchFilter]);
+
+  const updateFilter = (key, value) => {
+    setSearchFilter(prev => ({ ...prev, [key]: value }));
+  };
+
   return (
     <div className="w-full md:w-[40%] lg:w-[30%] h-auto p-4 border-b md:border-r md:border-b-0 border-gray-300">
     <h1 className="text-lg font-bold mb-2">Filters</h1>
@@ -66,8 +74,10 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
       <input
         type="number"
         name="price"
+        min={1}
+        max={1000000000}
         value={searchFilter.price}
-        onChange={(e) => setSearchFilter((prev) => ({ ...prev, price: e.target.value }))}
+        onChange={(e) => updateFilter("price",e.target.value)}
         placeholder="Enter max price"
         className="w-full p-2 border rounded mb-4"
       />
@@ -76,8 +86,10 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
       <input
         type="number"
         name="discount"
+        min={1}
+        max={80}
         value={searchFilter.discount}
-        onChange={(e) => setSearchFilter((prev) => ({ ...prev, discount: e.target.value }))}
+        onChange={(e) => updateFilter("discount",e.target.value)}
         placeholder="Min discount %"
         className="w-full p-2 border rounded mb-4"
       />
@@ -86,7 +98,7 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
       <select
         name="category"
         value={searchFilter.category}
-        onChange={(e) => setSearchFilter((prev) => ({ ...prev, category: e.target.value }))}
+        onChange={(e) => updateFilter("category",e.target.value)}
         className="w-full p-2 border rounded mb-4"
       >
         <option value="">All Categories</option>
@@ -102,7 +114,7 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
         type="text"
         name="brand"
         value={searchFilter.brand}
-        onChange={(e) => setSearchFilter((prev) => ({ ...prev, brand: e.target.value }))}
+        onChange={(e) => updateFilter("brand",e.target.value)}
         placeholder="Enter brand name"
         className="w-full p-2 border rounded mb-4"
       />
@@ -111,7 +123,7 @@ function SearchFilter({searchFilter,setSearchFilter,setProducts,products}) {
       <select
         name="sortOrder"
         value={searchFilter.sortOrder}
-        onChange={(e) => setSearchFilter((prev) => ({ ...prev, sortOrder: e.target.value }))}
+        onChange={(e) => updateFilter("sortOrder",e.target.value)}
         className="w-full p-2 border rounded mb-4"
       >
         <option value="price_asc">Price: Low to High</option>

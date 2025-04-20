@@ -3,7 +3,7 @@ import axios from "axios";
 const productRoute = "http://localhost:8000/v1/products";
 
 
-export const searchProducts = async({searchQuery,category,brand,discount,price,rating,sortOrder,page})=>{
+export const searchProducts = async({searchQuery,category,brand,discount,price,sortOrder,page})=>{
     try {
         const response = await axios.post(`${productRoute}/searchProducts?page=${page}`,{
             searchQuery:searchQuery,
@@ -11,7 +11,6 @@ export const searchProducts = async({searchQuery,category,brand,discount,price,r
             brand:brand,
             discount:discount,
             price:price,
-            rating:rating,
             sortOrder:sortOrder
         },{
             withCredentials:true
