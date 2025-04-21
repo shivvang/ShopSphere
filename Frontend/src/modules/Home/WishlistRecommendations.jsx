@@ -1,7 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 /* eslint-disable react/prop-types */
 function WishlistRecommendations ({ products=[] ,handleAddToWishlist}) {
+  const navigate = useNavigate();
   return (
     <div className="mt-12 px-4 md:px-10 lg:px-20">
       <div className="p-6 bg-[#1a1a1a] rounded-xl shadow-md">
@@ -24,6 +26,7 @@ function WishlistRecommendations ({ products=[] ,handleAddToWishlist}) {
             products.map((product) => (
             <div
               key={product.id}
+              onClick={()=>navigate(`/product/${product.id}`)}
               className="bg-[#121212] border border-gray-700 p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
             >
               {/* ✅ Image Handling */}
@@ -50,7 +53,10 @@ function WishlistRecommendations ({ products=[] ,handleAddToWishlist}) {
 
               {/* ✅ Wishlist Button */}
               <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all"
-              onClick={()=>{handleAddToWishlist(product.id,product.name,product.imageUrl,product.brand,product.price)}}>
+              onClick={(e)=>{
+                e.stopPropagation();
+                handleAddToWishlist(product.id,product.name,product.imageUrl,product.brand,product.price)
+                }}>
                 Add to Wishlist
               </button>
             </div>

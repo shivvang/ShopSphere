@@ -249,7 +249,30 @@ export const flashSaleProducts =async(req,res,next)=>{
 }
 
 
+export const getProduct = async(req,res,next)=>{
+  log.info("Get product endpoint hit...");
+  try {
+    const productId = req.params.productId;
 
+    if (!productId) {
+      log.error("Product ID is required.");
+      return next(new ApiError(400, "Product ID is required."));
+    }
+
+    const product = await Product.findById(productId);
+    
+    if (!product) {
+      log.error("Product not found.");
+      return next(new ApiError(404, "Product not found."));
+    }
+
+    return res.status(200).json({success:true,  message: "Product fetched successfully", product });
+
+  } catch (error) {
+    log.error("Error Fetching the Product:", error);
+    return next(new ApiError(500, "Something went wrong while Fetching the product.", error));
+  }
+}
 
 export const updateProduct = async (req, res, next) => {
   log.info("Update product endpoint hit...");

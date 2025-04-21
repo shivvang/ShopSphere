@@ -124,7 +124,7 @@ export const processOrder = async (event) => {
 
 export const createOrderFromCheckout = async (event) => {
     try {
-        const { userId, items } = event;
+        const { userId, orderId,items} = event;
 
         if (!userId || !items || items.length === 0) {
             log.warn("Missing required fields: userId or items", { userId, items });
@@ -165,6 +165,13 @@ export const createOrderFromCheckout = async (event) => {
 
        
         await customer.save();
+
+        await Notification.create({
+            customerId:userId,
+            orderId:orderId,
+            itemsCount:items.length,
+            message: `Your order of ${items.length} items has arrived!`,
+        })
 
         log.info(`Order created successfully for User: ${userId}`);
         return { success: true, message: "Order created successfully." };

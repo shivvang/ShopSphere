@@ -5,22 +5,33 @@ import toast from "react-hot-toast";
 import Spinner from "../modules/common/Spinner";
 
 const SellerSettings = () => {
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
+    const [passwords,setPasswords] = useState({
+      oldPassword:"",
+      newPassword:""
+    })
+
+    const handlePasswordChange = (e) => {
+      const { name, value } = e.target;
+      setPasswords((prev) => ({ ...prev, [name]: value }));
+    };
+
     const [loading,setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = async() => {
       if (loading) return;
-      setLoading(true);
-      const data = await logout();
-      if(data.success){
-        toast.success("You have been logged out successfully.");
+      try{
+        setLoading(true);
+        const data = await logout();
+        if(data.success){
+          toast.success("You have been logged out successfully.");
+          navigate("/seller")
+        }else{
+          toast.error(data.error);
+        }
+      }
+      finally{
         setLoading(false);
-        navigate("/seller")
-      }else{
-        setLoading(false);
-        toast.error(data.error);
       }
     };
   
@@ -29,17 +40,19 @@ const SellerSettings = () => {
 
       if(loading) return;
 
-      setLoading(true);
+      try{
+        setLoading(true);
 
       const data = await resetPassword(oldPassword, newPassword);
       if(data.success){
         toast.success("Password updated successfully. Please use the new password to log in.");
-        setLoading(false);
         setOldPassword("");
         setNewPassword("");
       }else{
-        setLoading(false);
         toast.error(data.error);
+      }
+      }finally{
+        setLoading(false);
       }
     };
   
@@ -47,27 +60,29 @@ const SellerSettings = () => {
       if(loading) return;
       const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
       if (confirmDelete) {
+       try{
         setLoading(true);
-       const data = await deleteSeller();
-
-       if (data.success){
+        const data = await deleteSeller();
+ 
+        if (data.success){
+         toast.success("Account deleted. We're sorry to see you go!");
+         navigate("/seller");
+        }else{
+         toast.error(data.error);
+        }  
+       }finally{
         setLoading(false);
-        toast.success("Account deleted. We're sorry to see you go!");
-        navigate("/seller");
-       }else{
-        setLoading(false);
-        toast.error(data.error);
-       }  
+       }
       }
     };
 
     const handleGoBack = () => {
       navigate(-1); // Navigates to the previous page in history
     };
+
+    if(loading) return <Spinner/>
   
     return (
-      <>
-      {loading && <Spinner/>}
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
         <div className="bg-white shadow-lg p-6 rounded-md border border-gray-300 w-full max-w-md">
           <h1 className="text-3xl font-bold text-[#FF6F00] mb-6 text-center">Seller Settings</h1>
@@ -84,17 +99,19 @@ const SellerSettings = () => {
             <h2 className="text-xl font-semibold text-gray-800">Reset Password</h2>
             <input 
               type="password" 
+              name="oldPassword"
               placeholder="Old Password" 
-              value={oldPassword} 
-              onChange={(e) => setOldPassword(e.target.value)} 
+              value={passwords.oldPassword} 
+              onChange={handlePasswordChange} 
               className="border border-gray-300 p-2 w-full rounded-md"
               required 
             />
             <input 
               type="password" 
+              name="newPassword"
               placeholder="New Password" 
-              value={newPassword} 
-              onChange={(e) => setNewPassword(e.target.value)} 
+              value={passwords.newPassword} 
+              onChange={handlePasswordChange} 
               className="border border-gray-300 p-2 w-full rounded-md"
               required 
             />
@@ -109,7 +126,6 @@ const SellerSettings = () => {
           </button>
         </div>
       </div>
-      </>
     );
   };
 

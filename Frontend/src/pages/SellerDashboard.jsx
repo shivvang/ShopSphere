@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useCallback } from "react";
 import { createProduct, deleteProduct, removeImageFromAWS, updateProduct, uploadFileAndGetUrl } from "../services/useProduct";
 import { getSellerProducts, refreshAccessToken } from "../services/useSeller";
 import {Link,useNavigate}  from "react-router-dom"
@@ -29,7 +29,7 @@ function SellerDashboard() {
     fetchProducts();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async() => {
     if (loading) return; // Prevent multiple requests
 
     setLoading(true);
@@ -46,7 +46,7 @@ function SellerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  },[]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -90,7 +90,7 @@ function SellerDashboard() {
     
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     if (loading) return;
 
@@ -119,9 +119,9 @@ function SellerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  },[]);
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = useCallback(async (productId) => {
     if (loading) return;
 
     setLoading(true);
@@ -138,7 +138,7 @@ function SellerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  },[]);
 
   const resetForm = () => {
     setFormData({
@@ -190,10 +190,9 @@ function SellerDashboard() {
     }
 }, [loginTime]);
 
- 
+  if(loading) return <Spinner/>
+
   return (
-    <>
-     {loading && <Spinner/>}
     <div className="p-6 bg-white min-h-screen text-black">
       <h1 className="text-3xl font-bold text-[#FF6F00] mb-4">Manage Products</h1>
       <Link to="/seller/settings" className="fixed bottom-4 right-4 bg-[#FF6F00] text-white p-3 rounded-full shadow-lg hover:bg-[#e65c00] transition">⚙️</Link>
@@ -204,7 +203,7 @@ function SellerDashboard() {
         <input type="number" name="discount" value={formData.discount } onChange={handleChange} placeholder="discount" className="border border-[#FF6F00] p-2 w-full mb-2"  />
         <input type="text" name="category" value={formData.category } onChange={handleChange} disabled={editingProduct} placeholder="Category" className="border border-[#FF6F00] p-2 w-full mb-2"  />
         <input type="text" name="brand" value={formData.brand } onChange={handleChange} disabled={editingProduct} placeholder="Brand" className="border border-[#FF6F00] p-2 w-full mb-2"  />
-        <input type="text" name="tags" value={formData.tags } onChange={(e)=>setFormData((prev)=>({...prev,tags:e.target.value}))} placeholder="Tags (comma-separated)" className="border border-[#FF6F00] p-2 w-full mb-2" />
+        <input type="text" name="tags" value={formData.tags } onChange={handleChange} placeholder="Tags (comma-separated)" className="border border-[#FF6F00] p-2 w-full mb-2" />
         <input type="text" name="searchKeywords" value={formData.searchKeywords } onChange={handleChange} placeholder="Search Keywords (comma-separated)" className="border border-[#FF6F00] p-2 w-full mb-2" />
         <input type="file" onChange={handleImageUpload} className="p-2 w-full bg-white text-black mb-2 border border-[#FF6F00]" accept="image/*" />
         {formData.imageUrl  && (
@@ -232,7 +231,6 @@ function SellerDashboard() {
         ))}
       </div>
     </div>
-    </>
   );
 }
 

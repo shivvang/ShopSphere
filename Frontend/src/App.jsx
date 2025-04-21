@@ -9,6 +9,7 @@ import { useState } from 'react'
 import SellerRoute from './routes/SellerRoute.jsx'
 import PrivateRoute from './modules/common/PrivateRoute.jsx'
 import useDeliveryNotification from './SocketClient/useDeliveryNotification.jsx'
+import ProductDetailPage from './pages/ProductDetailPage.jsx'
 
 function App() {
   const location = useLocation();
@@ -27,6 +28,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/search" element={<Search  searchQuery={searchQuery}/>} />
           <Route path="/profile/*" element={<ProfileRoute />} />
+          <Route path="/product/:ProductId" element={<ProductDetailPage />} />
         </Route>
         <Route path="/seller/*" element={<SellerRoute />} />
       </Routes>

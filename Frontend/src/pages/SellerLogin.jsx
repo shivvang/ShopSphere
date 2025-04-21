@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/useSeller";
 import {useSelector,useDispatch} from "react-redux"
@@ -36,9 +36,14 @@ function SellerLogin() {
 
     }
 
+    const handleChange = useCallback((e)=>{
+      const {name,value} = e.target;
+      setFormData((prev)=>({...prev,[name]:value}));
+    },[setFormData])
+
+    if(loading) return <Spinner/>
+    
   return (
-    <>
-    {loading && <Spinner/>}
     <div className="h-screen w-screen flex flex-col md:flex-row font-poppins">
     <div className="flex flex-col justify-center items-center sm:gap-7 md:gap-10 w-full md:w-1/2 h-1/3 md:h-full bg-[#FF6F00] text-center p-6">
       <h1 className="text-3xl md:text-4xl font-bold text-white">Merchant Login</h1>
@@ -53,16 +58,18 @@ function SellerLogin() {
         <input
           className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]"
           type="email"
+          name="email"
           placeholder="Enter Merchant Email"
           value={formData.email}
-          onChange={(e)=>setFormData((prev)=>({...prev,email:e.target.value}))}
+          onChange={handleChange}
         />
         <input
           className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6F00]"
           type="password"
+          name="password"
           placeholder="Enter Merchant Password"
           value={formData.password}
-          onChange={(e)=>setFormData((prev)=>({...prev,password:e.target.value}))}
+          onChange={handleChange}
         />
   
         <button className="w-full bg-[#FF6F00] text-white py-3 rounded-md font-semibold hover:bg-[#e65c00] transition">
@@ -77,7 +84,6 @@ function SellerLogin() {
       </form>
     </div>
   </div>
-  </>
   )
 }
 

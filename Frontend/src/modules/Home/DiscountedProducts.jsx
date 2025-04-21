@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function DiscountedProducts({discountedProducts,handleAddToCart}) {
+  const navigate = useNavigate();
   return (
     <>
     <div className="p-6 bg-[#1a1a1a] rounded-xl shadow-md">
@@ -10,6 +12,7 @@ function DiscountedProducts({discountedProducts,handleAddToCart}) {
       {discountedProducts.length > 0 ? (discountedProducts.map((product) => (
         <div
           key={product._id}
+          onClick={()=>navigate(`/product/${product._id}`)}
           className="bg-[#121212] border-2 border-[#FF6F00] p-4 rounded-lg shadow-md w-56 flex-shrink-0 snap-start"
         >
           {!product.imageUrl ? (
@@ -44,7 +47,10 @@ function DiscountedProducts({discountedProducts,handleAddToCart}) {
             </span>
           </div>
           <button className="mt-3 w-full bg-[#FF6F00] text-white font-semibold py-2 rounded-lg hover:bg-[#e65c00] transition-all"
-          onClick={()=>handleAddToCart(product._id,product.name,product.imageUrl,product.brand,product.price)}>
+          onClick={(e)=>{
+            e.stopPropagation();
+            handleAddToCart(product._id,product.name,product.imageUrl,product.brand,product.price)
+          }}>
             Add to Cart
           </button>
         </div>

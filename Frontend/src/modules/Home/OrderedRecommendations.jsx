@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function OrderedRecommendations({recommendedOrderedProducts,handleAddToCart}) {
+  const navigate = useNavigate();
   return (
     <>
     <h2 className="text-xl font-semibold mb-2">🚀 Frequently Bought Together</h2>
@@ -16,7 +18,7 @@ function OrderedRecommendations({recommendedOrderedProducts,handleAddToCart}) {
         </p>
       </div>
       ):(recommendedOrderedProducts.map((product) => (
-        <div key={product.id} className="overflow-y-hidden flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2">
+        <div key={product.id} className="overflow-y-hidden flex-shrink-0 w-36 sm:w-40 md:w-44 bg-[#1e1e1e] rounded-xl shadow-md p-3 mx-2" onClick={()=>navigate(`/product/${product.id}`)}>
           {!product.imageUrl ? (
             <div className="animate-pulse bg-gray-700 h-32 w-full rounded-lg"></div>
           ) : (
@@ -33,7 +35,10 @@ function OrderedRecommendations({recommendedOrderedProducts,handleAddToCart}) {
             <p className="text-sm text-[#FFB74D] font-semibold">₹{product.price}</p>
 
             <button className="mt-2 w-full bg-[#FF6F00] hover:bg-[#e65c00] text-white text-sm font-semibold py-1.5 rounded-md transition-all duration-200"
-            onClick={()=>handleAddToCart(product.id,product.name,product.imageUrl,product.brand,product.price)}>
+            onClick={(e)=>{
+              e.stopPropagation();
+              handleAddToCart(product.id,product.name,product.imageUrl,product.brand,product.price)
+              }}>
               Add to Cart
             </button>
           </div> 

@@ -39,6 +39,43 @@ export const markAsRead = async (req, res, next) => {
     }
   };
 
+export const markBulkAsRead = async(req,res,next)=>{
+  log.info("Mark bulk order notification as read endpoint hit...");
+  
+  try {
+    const { orderId } = req.params;
+    const userId = req.user.userId;
+
+    
+    if (!userId || !orderId) {
+      log.error("Missing userId or orderId in request.");
+      return next(new ApiError(400, "Missing user or product information."));
+    }
+
+    const notification = await Notification.findOne({ customerId: userId, orderId:orderId });
+
+    if (!notification) {
+      log.warn(`Notification not found for orderId: ${orderId}, userId: ${userId}`);
+      return next(new ApiError(404, "Notification not found."));
+    }
+
+    if (notification.isRead) {
+      return res.status(200).json({ success: true, message: "Notification already marked as read." });
+    }
+
+    notification.isRead = true;
+
+  
+    await notification.save();
+
+    return res.status(200).json({ success: true, message: "Notification marked as read." });
+
+  } catch (error) {
+    log.error("Error marking notification as read", error);
+    return next(new ApiError(500, "Failed to mark notification as read.", error));
+  }
+}
+
   export const fetchUnreadNotifications = async (req, res, next) => {
     log.info("Fetch unread notifications endpoint hit...");
   

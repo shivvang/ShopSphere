@@ -40,8 +40,9 @@ export const setOrder = async (req, res, next) => {
        
         const jobData = { userId, productId, priceAtPurchase, quantity,imageUrl,brand,name};
 
-       
-        const delay = 60 * 1000; // 7 days in milliseconds
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 7); 
+        const delay = futureDate.getTime() - Date.now(); 
 
         log.info(`Adding new job for user ${userId}`);
         
@@ -167,28 +168,30 @@ export const checkoutCart = async (req, res, next) => {
         log.info(`Order created successfully with ID: ${order._id}`);
 
        
-        // const delay = Date.now() + 7 * 24 * 60 * 60 * 1000; 
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 7); 
+        const delay = futureDate.getTime() - Date.now(); 
 
-        // for (const item of order.items) {
-        //     await deliveryQueue.add("processOrder", {
-        //         userId,
-        //         productId: item.productId,
-        //         priceAtPurchase: item.priceAtPurchase,
-        //         quantity: item.quantity,
-        //         orderId: order._id,
-        //         totalItemsCount: order.items.length, 
-        //     }, {
-        //         jobId: `order_${order._id}_${item.productId}`,
-        //         delay,
-        //         removeOnComplete: true,
-        //         removeOnFail: false,
-        //     });
-        // }
+
+        const orderId = order._id;
         
-        // log.info(`Added delivery jobs for order: ${order._id}`);
+        await deliveryQueue.add("processBulkOrder", {
+            userId,
+            orderId,
+            items:order.items.length
+        }, {
+            jobId:orderId.toString(),
+            delay,
+            removeOnComplete: true,
+            removeOnFail: false,
+        });     
+        
+        
+        log.info(`Added delivery jobs for order: ${orderId}`);
 
        
         await publishEventToExchange("order.checkout", {
+            orderId,
             userId,
             items: order.items.map(item => ({
                 productId: item.productId,

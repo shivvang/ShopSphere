@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Carousel({ products }) {
   const [index, setIndex] = useState(0);
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     if (products.length === 0) return;
     const interval = setInterval(() => {
@@ -18,6 +20,7 @@ function Carousel({ products }) {
     {products.map((product, i) => (
       <div 
         key={product._id} 
+        onClick={()=>navigate(`/product/${product._id}`)}
         className={`w-full h-full absolute transition-opacity duration-700 ${
           i === index ? "opacity-100 z-10" : "opacity-0 z-0"
         }`}

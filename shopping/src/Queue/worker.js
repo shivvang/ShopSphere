@@ -13,43 +13,48 @@ log.info("🔥 Delivery Worker started and ready to process jobs...");
 const deliveryWorker = new Worker(
     "DeliveryQueue",
     async (job) => {
-        const { userId, productId, priceAtPurchase, quantity,brand } = job.data;
+        if(job.name ==="processOrder"){
+            //process single order here
+            const { userId, productId, priceAtPurchase, quantity,brand } = job.data;
 
-        log.info(`Processing order for product ${productId}, delivery for user ${userId}`);
+            log.info(`Processing order for product ${productId}, delivery for user ${userId}`);
 
-        try {
-            if (!userId || !productId) {
-                log.warn("Order data is incomplete: missing userId or productId.");
-                return;
+            try {
+                if (!userId || !productId) {
+                    log.warn("Order data is incomplete: missing userId or productId.");
+                    return;
+                }
+
+                if (!priceAtPurchase || !quantity || !brand) {
+                    log.warn("Order data is incomplete: missing priceAtPurchase or quantity.");
+                    return;
+                }
+
+                const order = await Order.findOne({ userId, "items.productId": productId });
+
+                if (!order) {
+                    log.warn(`No order found for user ${userId} with product ${productId}`);
+                    return;
+                }
+
+                const item = order.items.find((item) => item.productId.toString() === productId);
+                if (item) {
+                    item.status = "delivered"; 
+                    await order.save();
+                    log.info(`Order updated: Product ${productId} marked as delivered for user ${userId}`);
+                } else {
+                    log.warn(`Product ${productId} not found in user's order ${order._id}`);
+                }
+
+            
+                publishEventToExchange("order.processed", { userId, productId });
+
+            } catch (error) {
+                log.error("Error processing order", { error: error.message, stack: error.stack });
+                throw new ApiError("Failed to process order");
             }
-
-            if (!priceAtPurchase || !quantity || !brand) {
-                log.warn("Order data is incomplete: missing priceAtPurchase or quantity.");
-                return;
-            }
-
-            const order = await Order.findOne({ userId, "items.productId": productId });
-
-            if (!order) {
-                log.warn(`No order found for user ${userId} with product ${productId}`);
-                return;
-            }
-
-            const item = order.items.find((item) => item.productId.toString() === productId);
-            if (item) {
-                item.status = "delivered"; 
-                await order.save();
-                log.info(`Order updated: Product ${productId} marked as delivered for user ${userId}`);
-            } else {
-                log.warn(`Product ${productId} not found in user's order ${order._id}`);
-            }
-
-           
-            publishEventToExchange("order.processed", { userId, productId });
-
-        } catch (error) {
-            log.error("Error processing order", { error: error.message, stack: error.stack });
-            throw new ApiError("Failed to process order");
+        }else if(job.name === "processBulkOrder"){
+            //process Bulk Order here
         }
     },
     {
@@ -64,24 +69,42 @@ const deliveryWorker = new Worker(
 
 
 deliveryWorker.on("completed", (job) => {
-    const { userId, productId, priceAtPurchase, quantity,imageUrl,brand,name} = job.data;
+    if(job.name ==="processOrder"){
+        const { userId, productId, priceAtPurchase, quantity,imageUrl,brand,name} = job.data;
 
-    log.info(`Order processing completed for user ${userId}, product ${productId}`);
+        log.info(`Order processing completed for user ${userId}, product ${productId}`);
 
-    if (!userId) {
-        log.warn("Cannot emit delivery update: userId is missing.");
-        return;
+        if (!userId) {
+            log.warn("Cannot emit delivery update: userId is missing.");
+            return;
+        }
+
+        io.to(userId).emit("deliveryUpdate", {
+            message: `Your order for product ${productId} has Arrived!`,
+            productId,
+            priceAtPurchase,
+            quantity,
+            imageUrl,
+            name,
+            brand,
+        });
+    }else if(job.name === "processBulkOrder"){
+        
+        const { userId,orderId,items } = job.data;
+
+        log.info(`Order processing completed for user ${userId}, Order ${orderId}`);
+
+        if (!userId) {
+            log.warn("Cannot emit delivery update: userId is missing.");
+            return;
+        }
+
+        io.to(userId).emit("deliveryUpdate", {
+            message: `Your order of ${items} items has arrived!`,
+            orderId,
+            itemCount: items,  
+        });
     }
-
-    io.to(userId).emit("deliveryUpdate", {
-        message: `Your order for product ${productId} has Arrived!`,
-        productId,
-        priceAtPurchase,
-        quantity,
-        imageUrl,
-        name,
-        brand,
-    });
 });
 
 
