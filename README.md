@@ -1,8 +1,3 @@
-Sure! Here's a polished, organized, and aesthetically pleasing version of your GitHub `README.md` in markdown format — complete with structure, emojis, and clean formatting for readability. 🌟
-
----
-
-```markdown
 # 🛍️ Shop Sphere
 
 **Shop Sphere** is a fully-featured **microservices-based e-commerce platform** designed for **scalability**, **modularity**, and **high performance**. Built with modern technologies and best practices, the platform consists of decoupled services that interact via **RabbitMQ** and **gRPC**, enabling seamless asynchronous and high-speed communication.
