@@ -255,7 +255,7 @@ npm run start:bullmq
 
 ## 🤝 Contributing
 
-We welcome all contributions! 💡
+Contributions are welcome! 💡
 
 - Fork this repository
 - Create a feature branch
