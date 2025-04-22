@@ -1,9 +1,11 @@
+import { lazy} from 'react';
 import {Routes,Route, Navigate} from "react-router-dom";
-import Profile from "../pages/Profile";
-import Wishlist from "../modules/Profile/Wishlist";
-import Cart from "../modules/Profile/Cart";
-import Orders from "../modules/Profile/Orders";
-import AccountSettings from "../modules/Profile/AccountSettings";
+
+const Profile = lazy(()=>import("../pages/Profile"));
+const Wishlist = lazy(()=>import("../modules/Profile/Wishlist"));
+const Cart = lazy(()=>import("../modules/Profile/Cart"));
+const Orders =  lazy(()=>import("../modules/Profile/Orders"));
+const AccountSettings = lazy(()=>import("../modules/Profile/AccountSettings"));
 
 function ProfileRoute() {
     return (

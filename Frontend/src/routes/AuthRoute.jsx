@@ -1,6 +1,8 @@
+import { lazy} from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom'
-import Register from '../pages/Register.jsx'
-import Login from '../pages/Login.jsx'
+
+const  Register = lazy(()=>import('../pages/Register.jsx'));
+const Login =  lazy(()=>import('../pages/Login.jsx'));
 
 function AuthRoute() {
   return (

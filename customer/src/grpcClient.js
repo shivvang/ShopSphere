@@ -15,7 +15,7 @@ const grpcObject = grpc.loadPackageDefinition(packageDef);
 const recommendationPackage = grpcObject.recommendation;
 
 const client = new recommendationPackage.RecommendationService(
-  '127.0.0.1:50051',
+  process.env.RECOMMENDATION_GRPC_ENDPOINT,
   grpc.credentials.createInsecure()
 );
 

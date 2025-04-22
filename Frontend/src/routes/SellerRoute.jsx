@@ -1,9 +1,12 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import SellerRegister from '../pages/SellerRegister.jsx'
-import SellerLogin from '../pages/SellerLogin.jsx'
-import SellerDashboard from '../pages/SellerDashboard.jsx'
-import SellerSettings from '../pages/SellerSettings.jsx'
+import { lazy} from 'react';
 import {Provider} from "react-redux"
+import { Navigate, Route, Routes } from 'react-router-dom'
+
+const SellerRegister =  lazy(()=>import('../pages/SellerRegister.jsx'));
+const SellerLogin = lazy(()=>import('../pages/SellerLogin.jsx')); 
+const SellerDashboard = lazy(()=>import('../pages/SellerDashboard.jsx')); 
+const SellerSettings = lazy(()=>import('../pages/SellerSettings.jsx'));
+
 import { sellerStore } from '../redux/Seller/store.js'
 import PrivateRoute from '../modules/Seller/PrivateRoute.jsx'
 
